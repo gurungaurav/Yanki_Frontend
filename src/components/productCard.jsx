@@ -53,22 +53,6 @@ export default function ProductCard({
           </span>
         </div>
         <p className="text-gray-700 mb-4 h-12 line-clamp-2">{description}</p>
-        <div className="flex items-center mb-4">
-          {[...Array(5)].map((_, i) => (
-            <Star
-              key={i}
-              size={16}
-              className={
-                i < Math.round(rating)
-                  ? "text-yellow-400 fill-current"
-                  : "text-gray-300"
-              }
-            />
-          ))}
-          <span className="ml-2 text-sm text-gray-600">
-            ({reviewsCount} reviews)
-          </span>
-        </div>
         <button className="w-full bg-black hover:bg-neutral-900 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center transition duration-300 transform  cursor-pointer">
           <ShoppingCart size={20} className="mr-2" />
           Add to Cart

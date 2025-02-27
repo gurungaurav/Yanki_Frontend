@@ -39,8 +39,14 @@ export default function LoginPage() {
       });
       formik.setSubmitting(false);
       formik.resetForm();
-      navigate("/");
       console.log("Form submitted");
+
+      if (data.data.role === "admin") {
+        navigate("/dashboard");
+        return;
+      } else {
+        navigate("/");
+      }
     } catch (error) {
       console.log(error);
       formik.setSubmitting(false);

@@ -1,11 +1,11 @@
 import { Star, ShoppingCart } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import ProductCard from "../../../components/cards/productCard";
-import { getAllProducts, getSpecificProduct } from "../../../api/product.api";
-import { getProductReviews } from "../../../api/reviews";
-import useCartStore from "../../../store/useCartStore";
+import { getAllProducts, getSpecificProduct } from "../../api/product.api";
+import { getProductReviews } from "../../api/reviews";
+import useCartStore from "../../store/useCartStore";
 import { toast } from "react-toastify";
+import ProductCard from "../../components/productCard";
 
 export default function ProductPage() {
   const params = useParams();
@@ -100,7 +100,7 @@ function ReviewSection({ productId }) {
 
   const geReview = async () => {
     try {
-      const response = await getProductReviews(productId);
+      const response = await getProductReviews(productId, false);
       setReview(response.data);
       console.log(response);
     } catch (error) {
@@ -285,7 +285,7 @@ function AddToCartSection({ _id, name, price, stockQuantity, images }) {
       </div>
       <button
         onClick={addToCart}
-        className="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg flex items-center justify-center transition duration-300"
+        className="bg-gray-900 hover:opacity-90 cursor-pointer text-white font-bold py-3 px-6 rounded-lg flex items-center justify-center transition duration-300"
       >
         <ShoppingCart size={20} className="mr-2" />
         Add to Cart

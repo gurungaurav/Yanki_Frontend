@@ -1,13 +1,18 @@
 import { useState } from "react";
 import { Trash2 } from "lucide-react";
-import useCartStore from "../../../store/useCartStore";
+import useCartStore from "../../store/useCartStore";
+import Button from "../../components/button";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import useUserStore from "../../store/useUserStore";
 
 export default function CartPage() {
   const initialCartItems = useCartStore((state) => state.cart);
   const removeItems = useCartStore((state) => state.removeFromCart);
   const updateItems = useCartStore((state) => state.updateQuantity);
-
+  const user = useUserStore((state) => state.user);
   const [cartItems, setCartItems] = useState(initialCartItems);
+  const naviagte = useNavigate();
 
   const removeItem = (id) => {
     setCartItems((items) => items.filter((item) => item.id !== id));
@@ -39,10 +44,20 @@ export default function CartPage() {
   const calculateTotal = () =>
     cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
+  const handleCheckout = () => {
+    if (user) {
+      naviagte("/product/check-out");
+    } else {
+      toast.error("Please login to continue");
+      naviagte("/login");
+    }
+    console.log("Checkout");
+  };
+
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8 h-full">
       <h1 className="text-2xl font-bold mb-8">Your Cart</h1>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 ">
         <div className="md:col-span-2">
           <div className="space-y-4">
             {cartItems.map((item) => (
@@ -108,7 +123,11 @@ export default function CartPage() {
             <span>Total:</span>
             <span>NPR {calculateTotal().toFixed(2)}</span>
           </div>
-          <button className="w-full">Proceed to Checkout</button>
+          <Button
+            buttonName={"Place Order"}
+            handleOnClick={handleCheckout}
+            className="w-full mt-4"
+          ></Button>{" "}
         </div>
       </div>
     </div>

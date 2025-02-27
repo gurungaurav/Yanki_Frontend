@@ -1,10 +1,10 @@
-import Navbar from "../components/common/navbar";
-import Footer from "../components/common/footer";
+import Footer from "../components/footer";
+import Navbar from "../components/navbar";
 
 function HomeLayout({ children }) {
   return (
     <div className="">
-      <div>
+      <div className="h-full flex flex-col">
         <Navbar />
         {children}
       </div>
