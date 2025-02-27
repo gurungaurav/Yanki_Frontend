@@ -1,14 +1,15 @@
 import { lazy } from "react";
 const AboutUsPage = lazy(() => import("../pages/aboutUs"));
 const Home = lazy(() => import("../pages/home"));
-const ProductPage = lazy(() =>
-  import("../pages/client/product/specificProduct")
-);
-const CartPage = lazy(() => import("../pages/client/product/cart"));
+const ProductPage = lazy(() => import("../pages/product/specificProduct"));
+const CartPage = lazy(() => import("../pages/product/cart"));
 const ContactPage = lazy(() => import("../pages/contactUs"));
 const FilterProductsPage = lazy(() =>
-  import("../pages/client/product/filterProducts")
+  import("../pages/product/filterProducts")
 );
+const ProfileDetails = lazy(() => import("../pages/profile/profileDetails"));
+const CheckOutPage = lazy(() => import("../pages/product/checkOut"));
+const OrderDetailsPage = lazy(() => import("../pages/product/orderDetails"));
 
 export const clientRoutes = [
   {
@@ -46,6 +47,24 @@ export const clientRoutes = [
     id: "contact",
     path: "/contact-us",
     element: ContactPage,
+    hasHomeLayout: true,
+  },
+  {
+    id: "profile",
+    path: "/profile",
+    element: ProfileDetails,
+    hasHomeLayout: true,
+  },
+  {
+    id: "profile",
+    path: "/product/check-out",
+    element: CheckOutPage,
+    hasHomeLayout: true,
+  },
+  {
+    id: "profile",
+    path: "/product/order-details",
+    element: OrderDetailsPage,
     hasHomeLayout: true,
   },
 ];

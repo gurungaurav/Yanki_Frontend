@@ -15,11 +15,17 @@ export const addProduct = async (form) => {
   return (await axiosInstance.post("/product/addProduct", form)).data;
 };
 
-export const updateProduct = async (form, productId) => {
-  return (await axiosInstance.post(`/product/updateProduct/${productId}`, form))
-    .data;
+export const updateProduct = async (productId, form) => {
+  return (
+    await axiosInstance.patch(`/product/updateProduct/${productId}`, form)
+  ).data;
 };
-export const softDeleteProduct = async (productId) => {
-  return (await axiosInstance.patch(`/product/deleteProduct/${productId}`))
-    .data;
+export const softDeleteProduct = async (productId, isDeleted) => {
+  console.log(isDeleted, "asas");
+
+  return (
+    await axiosInstance.patch(`/product/deleteProduct/${productId}`, {
+      isDeleted,
+    })
+  ).data;
 };

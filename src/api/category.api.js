@@ -12,3 +12,13 @@ export const deleteCategory = async (categoryId) => {
   return (await axiosInstance.delete(`/category/deleteCategory/${categoryId}`))
     .data;
 };
+
+export const updateCategory = async (categoryId, categoryName) => {
+  console.log(categoryName, "asas", categoryId);
+
+  return (
+    await axiosInstance.put(`/category/updateCategory/${categoryId}`, {
+      name: categoryName,
+    })
+  ).data;
+};

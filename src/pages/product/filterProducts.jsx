@@ -1,13 +1,12 @@
 import { useState, useEffect } from "react";
-import { getAllProducts } from "../../../api/product.api";
-import ProductCard from "../../../components/cards/productCard";
-import { getCategories } from "../../../api/category.api";
+import { getAllProducts } from "../../api/product.api";
+import ProductCard from "../../components/productCard";
+import { getCategories } from "../../api/category.api";
 
 export default function FilterProductsPage() {
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [minPrice, setMinPrice] = useState(0);
   const [maxPrice, setMaxPrice] = useState(2000);
-  const [inStock, setInStock] = useState(false);
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("All");
   const [availableCategories, setAvailableCategories] = useState([]);
@@ -29,11 +28,10 @@ export default function FilterProductsPage() {
 
   useEffect(() => {
     const filterProduct = async () => {
-      const filters = {};
+      const filters = { isDeleted: false };
 
       if (category !== "All") filters.categoryId = category;
       if (search.trim() !== "") filters.search = search.trim();
-      if (inStock) filters.inStock = true;
       if (minPrice || maxPrice) {
         filters.minPrice = minPrice || 0;
         filters.maxPrice = maxPrice || 0;
@@ -49,7 +47,7 @@ export default function FilterProductsPage() {
     };
 
     filterProduct();
-  }, [minPrice, maxPrice, inStock, search, category]);
+  }, [minPrice, maxPrice, search, category]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -102,19 +100,6 @@ export default function FilterProductsPage() {
                   className="w-full rounded-lg border p-3 text-gray-700"
                 />
               </div>
-            </div>
-
-            <div className="flex items-center space-x-2">
-              <input
-                id="inStock"
-                type="checkbox"
-                checked={inStock}
-                onChange={(e) => setInStock(e.target.checked)}
-                className="w-4 h-4 text-blue-600 border-gray-300 rounded"
-              />
-              <label htmlFor="inStock" className="text-sm font-medium">
-                In Stock Only
-              </label>
             </div>
           </div>
 

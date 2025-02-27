@@ -1,7 +1,7 @@
-import ProductCard from "../components/cards/productCard";
-import Hero from "../components/common/hero";
+import Hero from "../components/hero";
 import { getAllProducts } from "../api/product.api";
 import { useEffect, useState } from "react";
+import ProductCard from "../components/productCard";
 
 export default function Home() {
   const [products, setProducts] = useState([]);
@@ -11,7 +11,7 @@ export default function Home() {
   }, []);
 
   const getProducts = async () => {
-    const data = await getAllProducts({ limit: 3 });
+    const data = await getAllProducts({ limit: 3, isDeleted: false });
     setProducts(data.data);
     // console.log(data);
   };
