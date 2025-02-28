@@ -7,7 +7,7 @@ const Button = ({ buttonName, handleOnClick, className, type, isDisabled }) => {
       type={type}
       disabled={isDisabled}
       className={cn(
-        `p-2 rounded-md bg-gray-900 text-white font-semibold  duration-300 ${
+        `py-2 px-4 text-sm rounded-md bg-gray-900 text-white font-semibold  duration-300 ${
           isDisabled
             ? " opacity-50 cursor-not-allowed"
             : "hover:opacity-90 cursor-pointer"

@@ -6,10 +6,12 @@ import { getCategories } from "../../../api/category.api";
 import TextInput from "../../../components/textInput";
 import { addProduct } from "../../../api/product.api";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 const AddProductPage = () => {
   const [images, setImages] = useState([]);
   const [availableCategories, setAvailableCategories] = useState([]);
+  const navigate = useNavigate();
 
   const formik = useFormik({
     initialValues: {
@@ -83,6 +85,7 @@ const AddProductPage = () => {
       const data = await addProduct(formData);
       console.log(data);
       toast.success("Product added successfully");
+      navigate("/dashboard/products");
     } catch (error) {
       console.error("Failed to add product:", error);
       toast.error(error.response.data.message);

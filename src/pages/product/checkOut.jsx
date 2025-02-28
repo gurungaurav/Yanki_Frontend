@@ -6,12 +6,13 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { toast } from "react-toastify";
 import { getUserDetailById } from "../../api/user.api";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import useUserStore from "../../store/useUserStore";
 import { placeOrder } from "../../api/order.api";
 
 export default function CheckOutPage() {
   const initialCartItems = useCartStore((state) => state.cart);
+  const clearCart = useCartStore((state) => state.clearCart); // Get the clearCart function
   const [paymentMethod, setPaymentMethod] = useState("online");
   const navigate = useNavigate();
   const loggedUser = useUserStore((state) => state.user);
@@ -74,6 +75,7 @@ export default function CheckOutPage() {
       };
 
       const data = await placeOrder(initialValues, loggedUser.token);
+      clearCart();
       window.location.href = data.data.payment_url;
       console.log(data.data, "sdsdsds");
     } catch (error) {
@@ -94,7 +96,7 @@ export default function CheckOutPage() {
       >
         {/* Payment and Input Fields Section */}
         <div className="md:col-span-2 space-y-6">
-          <div className="bg-white p-6 rounded-lg shadow">
+          <div className="bg-white p-6 rounded-md border border-gray-200 shadow">
             <h2 className="text-lg font-semibold mb-4">Payment Method</h2>
             <div className="flex space-x-4">
               <label className="flex items-center space-x-2">
@@ -123,7 +125,7 @@ export default function CheckOutPage() {
           </div>
 
           {/* Input Fields */}
-          <div className="bg-white p-6 rounded-lg shadow space-y-4">
+          <div className="bg-white p-6 rounded-md border border-gray-200 shadow">
             <h2 className="text-lg font-semibold mb-4">Shipping Details</h2>
             <div className="flex space-x-4">
               <TextInput
@@ -143,7 +145,7 @@ export default function CheckOutPage() {
             </div>
             <TextInput
               name="address"
-              label={"address"}
+              label={"Address"}
               placeholder="Enter the address"
               type="text"
               formik={formik}
@@ -159,24 +161,37 @@ export default function CheckOutPage() {
         </div>
 
         {/* Order Summary */}
-        <div className="bg-gray-100 p-6 rounded-lg h-fit">
-          <h2 className="text-lg font-semibold mb-4">Order Summary</h2>
+        <div className=" p-6 rounded-md h-fit border border-gray-100 shadow">
+          <h2 className=" border-b pb-4 mb-4 border-gray-300 font-semibold text-lg">
+            Order Summary
+          </h2>
           <div className="space-y-2">
-            {initialCartItems.map((item) => (
-              <div key={item.id} className="flex justify-between text-sm">
-                <div className="flex items-center space-x-2">
-                  <img src={item.image} alt={item.name} className="w-16 h-16" />
-                  <span>
-                    {item.name} x {item.quantity}
-                  </span>
+            {initialCartItems?.map((item, index) => (
+              <Link
+                to={`/product/${item.productId}`}
+                className="flex items-start gap-4 cursor-pointer hover:bg-gray-100 p-2 rounded-md duration-300"
+                key={index}
+              >
+                <div className="relative h-20 w-20 rounded-md overflow-hidden bg-gray-100 flex-shrink-0">
+                  <img
+                    src={item.imageUrl}
+                    alt={item.productName}
+                    className="object-cover w-full h-full"
+                  />
                 </div>
-                <span>NPR {item.price.toFixed(2)}</span>
-              </div>
+                <div className="flex-1">
+                  <div className="flex justify-between">
+                    <h3 className="font-medium">{item.name}</h3>
+                    <p className="font-medium">NPR {item.price}</p>
+                  </div>
+                  <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
+                </div>
+              </Link>
             ))}
           </div>
-          <div className="flex justify-between mt-4 text-lg font-bold">
+          <div className="flex justify-between font-medium border-t mt-4 pt-2 mb-4 border-gray-300">
             <span>Total:</span>
-            <span>NPR {calculateTotal().toFixed(2)}</span>
+            <span>NPR {calculateTotal()}</span>
           </div>
           <Button
             buttonName={"Place Order"}

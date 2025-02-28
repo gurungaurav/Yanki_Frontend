@@ -15,3 +15,27 @@ export const verifyOrder = async (form, jwt) => {
     })
   ).data;
 };
+
+export const cancelOrder = async (id, jwt) => {
+  return (
+    await axiosInstance.delete(`/order/cancelOrder/${id}`, {
+      headers: { Authorization: `Bearer ${jwt}` },
+    })
+  ).data;
+};
+
+export const getSpecificUserOrders = async (jwt) => {
+  return (
+    await axiosInstance.get("/order/getSpecificUserOrders", {
+      headers: { Authorization: `Bearer ${jwt}` },
+    })
+  ).data;
+};
+
+export const getSpecificOrder = async (id, jwt) => {
+  return (
+    await axiosInstance.get(`/order/getSpecificOrder/${id}`, {
+      headers: { Authorization: `Bearer ${jwt}` },
+    })
+  ).data;
+};

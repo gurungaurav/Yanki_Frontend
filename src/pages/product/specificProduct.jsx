@@ -248,7 +248,7 @@ function AddToCartSection({ _id, name, price, stockQuantity, images }) {
         );
       }
     }
-
+    toast.success("Product added to cart");
     addItems({
       id: _id,
       name,
