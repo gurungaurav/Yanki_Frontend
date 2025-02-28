@@ -40,7 +40,7 @@ export default function Navbar() {
   };
 
   return (
-    <div className="sticky top-0 z-50 flex items-center justify-between shadow-md bg-white px-5 py-4 sm:px-10 md:px-20">
+    <div className="sticky top-0 z-50 flex items-center justify-between shadow bg-white px-5 py-4 sm:px-10 md:px-20">
       <Link to="/" className="h-[3rem] w-[6rem] md:h-[4rem] md:w-[8rem]">
         <h1>Yanki</h1>
       </Link>
@@ -83,6 +83,12 @@ export default function Navbar() {
                       onClick={() => handleNavigate(`/profile`)}
                     >
                       Profile
+                    </li>
+                    <li
+                      className="hover:bg-gray-200 px-4 py-2 cursor-pointer"
+                      onClick={() => handleNavigate(`/product/order-list`)}
+                    >
+                      Orders
                     </li>
                     <li
                       className="hover:bg-gray-200 px-4 py-2 cursor-pointer"

@@ -54,6 +54,17 @@ export default function CartPage() {
     console.log("Checkout");
   };
 
+  if (!cartItems.length) {
+    return (
+      <div className="container mx-auto p-4">
+        <h1 className="text-2xl font-bold mb-6">Your Cart </h1>
+        <div className="flex justify-center items-center h-96">
+          <h1 className="text-2xl font-bold">No items in your cart</h1>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto px-4 py-8 h-full">
       <h1 className="text-2xl font-bold mb-8">Your Cart</h1>
@@ -63,21 +74,19 @@ export default function CartPage() {
             {cartItems.map((item) => (
               <div
                 key={item.id}
-                className="flex items-center space-x-4 border-b pb-4"
+                className="flex items-center space-x-4 border-b border-b-gray-300 pb-4"
               >
                 <img
                   src={item.imageUrl || "/placeholder.svg"}
                   alt={item.name}
-                  className="rounded-md w-16 h-16"
+                  className="rounded-md w-16 h-16 object-cover"
                 />
                 <div className="flex-grow">
                   <h3 className="font-semibold">{item.name}</h3>
                   <p className="text-sm text-gray-500">
                     Available Quantity: {item.availableQuantity}
                   </p>
-                  <p className="text-sm text-gray-500">
-                    NPR {item.price.toFixed(2)}
-                  </p>
+                  <p className="text-sm text-gray-500">NPR {item.price}</p>
                 </div>
                 <div className="flex items-center border rounded-lg mr-4">
                   <button
@@ -109,19 +118,13 @@ export default function CartPage() {
             ))}
           </div>
         </div>
-        <div className="bg-gray-100 p-6 rounded-lg">
-          <h2 className="text-lg font-semibold mb-4">Cart Summary</h2>
-          <div className="flex justify-between mb-2">
-            <span>Subtotal:</span>
-            <span>NPR {calculateTotal().toFixed(2)}</span>
-          </div>
-          <div className="flex justify-between mb-4">
-            <span>Shipping:</span>
-            <span>Free</span>
-          </div>
-          <div className="flex justify-between mb-4 text-lg font-bold">
+        <div className=" p-6 rounded-md border border-gray-100 shadow">
+          <h2 className="text-lg font-semibold pb-2 border-b border-b-gray-300">
+            Cart Summary
+          </h2>
+          <div className="flex justify-between mb-4 text-lg font-semibold pt-2">
             <span>Total:</span>
-            <span>NPR {calculateTotal().toFixed(2)}</span>
+            <span>NPR {calculateTotal()}</span>
           </div>
           <Button
             buttonName={"Place Order"}

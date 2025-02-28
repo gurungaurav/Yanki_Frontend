@@ -10,6 +10,7 @@ import {
 import TextInput from "../../../components/textInput";
 import * as Yup from "yup";
 import { useFormik } from "formik";
+import { toast } from "react-toastify";
 
 const CategoryListsPage = () => {
   const navigate = useNavigate();
@@ -30,10 +31,12 @@ const CategoryListsPage = () => {
     }),
     onSubmit: async (values) => {
       try {
-        await addCategory(values);
+        const data = await addCategory(values);
         fetchCategories();
         closeAddCategoryModal();
+        toast.success(data.message);
       } catch (error) {
+        toast.error(error.response.data.message);
         console.error("Failed to add category:", error);
       }
     },

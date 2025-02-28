@@ -1,17 +1,48 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Check, CreditCard, Truck } from "lucide-react";
-import { verifyOrder } from "../../api/order.api";
+import { getSpecificOrder, verifyOrder } from "../../api/order.api";
 import useUserStore from "../../store/useUserStore";
 import { toast } from "react-toastify";
-import { useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
+import { Badge } from "../../components/badge";
 
 export default function OrderDetailsPage() {
   const loggedUser = useUserStore((state) => state.user);
   const [searchParams] = useSearchParams();
   const pidx = searchParams.get("pidx");
   const purchase_order_id = searchParams.get("purchase_order_id");
+  const [orderDetails, setOrderDetails] = useState(null); // Initially null to handle order not found state
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null); // To handle errors
 
-  console.log(pidx, purchase_order_id);
+  useEffect(() => {
+    verifyPayment();
+  }, [pidx, purchase_order_id, loggedUser.token]);
+
+  useEffect(() => {
+    if (purchase_order_id) {
+      fetchOrderDetails();
+    } else {
+      setError("Invalid order ID.");
+      setLoading(false);
+    }
+  }, [purchase_order_id]);
+
+  const fetchOrderDetails = async () => {
+    try {
+      const response = await getSpecificOrder(
+        purchase_order_id,
+        loggedUser.token
+      );
+      setOrderDetails(response.data);
+    } catch (error) {
+      setError(
+        error.response?.data?.message || "Failed to fetch order details."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const verifyPayment = async () => {
     try {
@@ -20,46 +51,69 @@ export default function OrderDetailsPage() {
           { pidx, orderId: purchase_order_id },
           loggedUser.token
         );
-        console.log(response, "sdsd");
-
+        fetchOrderDetails();
         toast.success(response.message);
       }
     } catch (error) {
-      toast.error(error.response?.data?.message);
-      console.error("Failed to verify payment:", error);
+      toast.error(
+        error.response?.data?.message || "Payment verification failed."
+      );
     }
   };
 
-  useEffect(() => {
-    verifyPayment();
-  }, [pidx, purchase_order_id, loggedUser.token]);
+  const calculateTotalAmount = (items) => {
+    return items?.reduce(
+      (total, item) => total + item.price * item.quantity,
+      0
+    );
+  };
+
+  const totalAmount =
+    orderDetails?.totalAmount || calculateTotalAmount(orderDetails?.items);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <main className="container mx-auto px-4 py-12 w-full">
+          <div className="text-center text-red-600 font-semibold">{error}</div>
+        </main>
+      </div>
+    );
+  }
+
+  if (!orderDetails) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <main className="container mx-auto px-4 py-12 w-full">
+          <div className="text-center text-red-600 font-semibold">
+            Order not found
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="h-full ">
       <main className="container mx-auto px-4 py-12 w-full">
-        <div className="mb-8 text-center">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 mb-4">
-            <Check className="h-8 w-8 text-green-600" />
-          </div>
-          <h1 className="text-3xl font-bold mb-2">Payment Successful!</h1>
-          <p className="text-gray-600 max-w-md mx-auto">
-            Thank you for your purchase. Your order has been confirmed and will
-            be shipped shortly.
-          </p>
-        </div>
-        <div className="flex gap-8   justify-center">
-          <div className="mb-8 bg-white shadow rounded-lg p-4 h-fit">
-            <div className="pb-4 border-b mb-4 border-b-gray-300">
+        <div className="flex gap-8 justify-center">
+          <div className="mb-8 bg-white shadow rounded-md p-4  w-xl border border-gray-100">
+            <div className="pb-4 border-b mb-4 border-gray-300">
               <div className="flex justify-between items-start">
                 <div>
-                  <div className="text-xl font-bold">Order #BS-78291</div>
+                  <div className="text-xl font-bold">
+                    Order #{orderDetails.orderId}
+                  </div>
                   <div className="text-sm text-gray-500">
-                    Placed on June 15, 2024 at 2:45 PM
+                    Placed on{" "}
+                    {new Date(orderDetails.orderDate).toLocaleString()}
                   </div>
                 </div>
-                <span className="bg-green-50 text-green-700 border-green-200 inline-block px-2 py-1 text-xs font-semibold rounded-3xl">
-                  Confirmed
-                </span>
+                <Badge status={orderDetails.orderStatus} />
               </div>
             </div>
             <div className="pb-4 mb-4">
@@ -69,11 +123,8 @@ export default function OrderDetailsPage() {
                     SHIPPING ADDRESS
                   </h3>
                   <div className="text-sm">
-                    <p className="font-medium">John Smith</p>
-                    <p>123 Barber Street</p>
-                    <p>Apt 4B</p>
-                    <p>New York, NY 10001</p>
-                    <p>United States</p>
+                    <p className="font-medium">{orderDetails.username}</p>
+                    <p>{orderDetails.address}</p>
                   </div>
                 </div>
                 <div className="flex-1">
@@ -81,9 +132,13 @@ export default function OrderDetailsPage() {
                     PAYMENT METHOD
                   </h3>
                   <div className="flex items-center gap-2">
-                    <CreditCard className="h-4 w-4" />
+                    {orderDetails.paymentMethod === "Khalti" ? (
+                      <CreditCard className="h-4 w-4" />
+                    ) : (
+                      <Check className="h-4 w-4" />
+                    )}
                     <span className="text-sm font-medium">
-                      Visa ending in 4242
+                      {orderDetails.paymentMethod}
                     </span>
                   </div>
                 </div>
@@ -97,96 +152,44 @@ export default function OrderDetailsPage() {
                       Standard Shipping
                     </span>
                   </div>
-                  <p className="text-sm text-gray-500 mt-1">
-                    Estimated delivery: June 20-22
-                  </p>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="mb-8 bg-white shadow rounded-lg p-4 w-2xl">
+          <div className="mb-8 bg-white shadow rounded-lg p-4 w-2xl border border-gray-100">
             <div className=" border-b pb-4 mb-4 border-gray-300">
               <div className="text-xl font-bold">Order Details</div>
             </div>
             <div className=" mb-4">
               <div className="space-y-6">
-                <div className="flex items-start gap-4">
-                  <div className="relative h-20 w-20 rounded-md overflow-hidden bg-gray-100 flex-shrink-0">
-                    <img
-                      src="/placeholder.svg?height=80&width=80"
-                      alt="Professional Hair Clippers"
-                      width={80}
-                      height={80}
-                      className="object-cover"
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex justify-between">
-                      <h3 className="font-medium">
-                        Professional Hair Clippers
-                      </h3>
-                      <p className="font-medium">$89.99</p>
+                {orderDetails.items.map((item, index) => (
+                  <Link
+                    to={`/product/${item.productId}`}
+                    className="flex items-start gap-4 cursor-pointer hover:bg-gray-100 p-2 rounded-md duration-300"
+                    key={index}
+                  >
+                    <div className="relative h-20 w-20 rounded-md overflow-hidden bg-gray-100 flex-shrink-0">
+                      <img
+                        src={item.image}
+                        alt={item.productName}
+                        className="object-cover w-full h-full"
+                      />
                     </div>
-                    <p className="text-sm text-gray-500">
-                      Premium stainless steel with multiple guard sizes
-                    </p>
-                    <div className="flex items-center mt-1">
-                      <p className="text-sm text-gray-500">Qty: 1</p>
+                    <div className="flex-1">
+                      <div className="flex justify-between">
+                        <h3 className="font-medium">{item.productName}</h3>
+                        <p className="font-medium">NPR {item.price}</p>
+                      </div>
+                      <p className="text-sm text-gray-500">
+                        Qty: {item.quantity}
+                      </p>
                     </div>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-4">
-                  <div className="relative h-20 w-20 rounded-md overflow-hidden bg-gray-100 flex-shrink-0">
-                    <img
-                      src="/placeholder.svg?height=80&width=80"
-                      alt="Beard Trimming Scissors"
-                      width={80}
-                      height={80}
-                      className="object-cover"
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex justify-between">
-                      <h3 className="font-medium">Beard Trimming Scissors</h3>
-                      <p className="font-medium">$34.50</p>
-                    </div>
-                    <p className="text-sm text-gray-500">
-                      Professional grade stainless steel scissors
-                    </p>
-                    <div className="flex items-center mt-1">
-                      <p className="text-sm text-gray-500">Qty: 1</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-4">
-                  <div className="relative h-20 w-20 rounded-md overflow-hidden bg-gray-100 flex-shrink-0">
-                    <img
-                      src="/placeholder.svg?height=80&width=80"
-                      alt="Premium Shaving Cream"
-                      width={80}
-                      height={80}
-                      className="object-cover"
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex justify-between">
-                      <h3 className="font-medium">Premium Shaving Cream</h3>
-                      <p className="font-medium">$24.99</p>
-                    </div>
-                    <p className="text-sm text-gray-500">
-                      Sandalwood scent, 8oz bottle
-                    </p>
-                    <div className="flex items-center mt-1">
-                      <p className="text-sm text-gray-500">Qty: 2</p>
-                    </div>
-                  </div>
-                </div>
+                  </Link>
+                ))}
                 <div className="flex justify-between font-medium border-t pt-4 mb-4 border-gray-300">
                   <span>Total</span>
-                  <span>$198.09</span>
+                  <span>NPR {totalAmount}</span>
                 </div>
               </div>
             </div>
