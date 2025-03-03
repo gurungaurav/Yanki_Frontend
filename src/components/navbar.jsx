@@ -74,7 +74,7 @@ export default function Navbar() {
           </div>
 
           {isDropdownOpen && (
-            <div className="absolute right-0 mt-28 w-40 bg-white shadow-md rounded-md border border-gray-200">
+            <div className="absolute right-0 mt-40 w-40 bg-white shadow-md rounded-md border border-gray-200">
               <ul className="text-sm">
                 {user ? (
                   <>

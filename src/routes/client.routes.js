@@ -11,6 +11,9 @@ const ProfileDetails = lazy(() => import("../pages/profile/profileDetails"));
 const CheckOutPage = lazy(() => import("../pages/product/checkOut"));
 const OrderDetailsPage = lazy(() => import("../pages/product/orderDetails"));
 const OrderListPage = lazy(() => import("../pages/product/orderLists"));
+const EditProfilePage = lazy(() => import("../pages/profile/editProfile"));
+const EditPasswordPage = lazy(() => import("../pages/profile/editPassword"));
+
 export const clientRoutes = [
   {
     id: "home",
@@ -71,6 +74,18 @@ export const clientRoutes = [
     id: "profile",
     path: "/product/order-list",
     element: OrderListPage,
+    hasHomeLayout: true,
+  },
+  {
+    id: "editProfile",
+    path: "/profile/edit-profile",
+    element: EditProfilePage,
+    hasHomeLayout: true,
+  },
+  {
+    id: "editProfile",
+    path: "/profile/edit-password",
+    element: EditPasswordPage,
     hasHomeLayout: true,
   },
 ];

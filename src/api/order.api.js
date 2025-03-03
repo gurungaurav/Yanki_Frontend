@@ -25,6 +25,8 @@ export const cancelOrder = async (id, jwt) => {
 };
 
 export const getSpecificUserOrders = async (jwt) => {
+  console.log(jwt, "jwt");
+
   return (
     await axiosInstance.get("/order/getSpecificUserOrders", {
       headers: { Authorization: `Bearer ${jwt}` },
@@ -32,10 +34,23 @@ export const getSpecificUserOrders = async (jwt) => {
   ).data;
 };
 
-export const getSpecificOrder = async (id, jwt) => {
+export const getOrdersAdmin = async (filters) => {
+  return (await axiosInstance.get("/order/getOrdersAdmin", { params: filters }))
+    .data;
+};
+
+export const getSpecificOrder = async (id) => {
+  return (await axiosInstance.get(`/order/getSpecificOrder/${id}`)).data;
+};
+
+export const updateOrderStatus = async (id, status, jwt) => {
   return (
-    await axiosInstance.get(`/order/getSpecificOrder/${id}`, {
-      headers: { Authorization: `Bearer ${jwt}` },
-    })
+    await axiosInstance.put(
+      `/order/updateOrderStatus/${id}`,
+      { status },
+      {
+        headers: { Authorization: `Bearer ${jwt}` },
+      }
+    )
   ).data;
 };

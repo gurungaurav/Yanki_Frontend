@@ -1,7 +1,9 @@
 import { axiosInstance } from "./index.api";
 
-export const getCategories = async () => {
-  return (await axiosInstance.get("/category/getCategories")).data;
+export const getCategories = async (isDeleted) => {
+  return (
+    await axiosInstance.get("/category/getCategories", { params: isDeleted })
+  ).data;
 };
 
 export const addCategory = async (category) => {

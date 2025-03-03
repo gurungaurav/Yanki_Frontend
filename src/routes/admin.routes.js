@@ -18,6 +18,10 @@ const UpdateProductPage = lazy(() =>
 const CategoryListsPage = lazy(() =>
   import("../pages/admin/products/categoryLists")
 );
+const OrderListsPage = lazy(() => import("../pages/admin/products/orderLists"));
+const OrderDetailsPage = lazy(() => import("../pages/product/orderDetails"));
+const MessageListsPage = lazy(() => import("../pages/admin/messageLists"));
+const UserListsPage = lazy(() => import("../pages/admin/userLists"));
 
 export const adminRoutes = [
   {
@@ -60,6 +64,35 @@ export const adminRoutes = [
     id: "productReviewListsPage",
     path: "/dashboard/categories",
     element: CategoryListsPage,
+    hasAdminLayout: true,
+    // hasAuth: true,
+  },
+
+  {
+    id: "orderLists",
+    path: "/dashboard/orders",
+    element: OrderListsPage,
+    hasAdminLayout: true,
+    // hasAuth: true,
+  },
+  {
+    id: "orderLists",
+    path: "/dashboard/order-details",
+    element: OrderDetailsPage,
+    hasAdminLayout: true,
+    // hasAuth: true,
+  },
+  {
+    id: "messages",
+    path: "/dashboard/messages",
+    element: MessageListsPage,
+    hasAdminLayout: true,
+    // hasAuth: true,
+  },
+  {
+    id: "users",
+    path: "/dashboard/users",
+    element: UserListsPage,
     hasAdminLayout: true,
     // hasAuth: true,
   },

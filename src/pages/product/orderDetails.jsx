@@ -1,10 +1,16 @@
 import { useEffect, useState } from "react";
 import { Check, CreditCard, Truck } from "lucide-react";
-import { getSpecificOrder, verifyOrder } from "../../api/order.api";
+import {
+  cancelOrder,
+  getSpecificOrder,
+  placeOrder,
+  verifyOrder,
+} from "../../api/order.api";
 import useUserStore from "../../store/useUserStore";
 import { toast } from "react-toastify";
 import { Link, useSearchParams } from "react-router-dom";
 import { Badge } from "../../components/badge";
+import Button from "../../components/button";
 
 export default function OrderDetailsPage() {
   const loggedUser = useUserStore((state) => state.user);
@@ -14,10 +20,11 @@ export default function OrderDetailsPage() {
   const [orderDetails, setOrderDetails] = useState(null); // Initially null to handle order not found state
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null); // To handle errors
+  const [showRefundModal, setShowRefundModal] = useState(false);
 
   useEffect(() => {
     verifyPayment();
-  }, [pidx, purchase_order_id, loggedUser.token]);
+  }, [pidx, purchase_order_id, loggedUser?.token]);
 
   useEffect(() => {
     if (purchase_order_id) {
@@ -30,10 +37,7 @@ export default function OrderDetailsPage() {
 
   const fetchOrderDetails = async () => {
     try {
-      const response = await getSpecificOrder(
-        purchase_order_id,
-        loggedUser.token
-      );
+      const response = await getSpecificOrder(purchase_order_id);
       setOrderDetails(response.data);
     } catch (error) {
       setError(
@@ -61,11 +65,41 @@ export default function OrderDetailsPage() {
     }
   };
 
+  const handleCancelOrder = async () => {
+    try {
+      const response = await cancelOrder(purchase_order_id, loggedUser.token);
+      fetchOrderDetails();
+      setShowRefundModal(false);
+      toast.success(response.message);
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to cancel order.");
+    }
+  };
+
   const calculateTotalAmount = (items) => {
     return items?.reduce(
       (total, item) => total + item.price * item.quantity,
       0
     );
+  };
+
+  const processPayment = async () => {
+    console.log(totalAmount, "totalAmount");
+
+    try {
+      const initialValues = {
+        purchase_order_id,
+        website_url: "http://localhost:5000",
+        totalPrice: totalAmount,
+      };
+
+      const data = await placeOrder(initialValues, loggedUser.token);
+      window.location.href = data.data.payment_url;
+      console.log(data.data, "sdsdsds");
+    } catch (error) {
+      console.error("Failed to place order:", error);
+      toast.error(error.response?.data?.message);
+    }
   };
 
   const totalAmount =
@@ -154,6 +188,38 @@ export default function OrderDetailsPage() {
                   </div>
                 </div>
               </div>
+              {orderDetails.orderStatus === "pending" && (
+                //either the user can verify the payment or cancel the order
+                <p className="text-sm text-gray-500 mt-4">
+                  You can either verify the payment to proceed with the order or
+                  cancel the order if you no longer wish to continue.
+                </p>
+              )}
+              {orderDetails.orderStatus === "shipped" && (
+                <p className="text-sm text-gray-500 mt-4">
+                  Your order has been shipped. It will be delivered to you
+                  shortly. You can cancel the order if you no longer wish to
+                  continue.
+                </p>
+              )}
+
+              <div className="flex  gap-4 mt-2">
+                {orderDetails.orderStatus === "pending" && (
+                  <Button
+                    buttonName={"Verify Payment"}
+                    handleOnClick={processPayment}
+                    // handleOnClick={verifyPayment}
+                  />
+                )}
+
+                {(orderDetails.orderStatus === "shipped" ||
+                  orderDetails.orderStatus === "pending") && (
+                  <Button
+                    buttonName={"Cancel Order"}
+                    handleOnClick={() => setShowRefundModal(true)}
+                  />
+                )}
+              </div>
             </div>
           </div>
 
@@ -196,6 +262,28 @@ export default function OrderDetailsPage() {
           </div>
         </div>
       </main>
+      {showRefundModal && (
+        <div className="fixed inset-0 bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white p-6 rounded-md shadow-lg w-1/3">
+            <h3 className="text-lg font-semibold">Refund Order</h3>
+            <p className="text-sm text-gray-500">
+              Are you sure you want to refund this order?
+            </p>
+            <div className="mt-4 flex justify-end gap-4">
+              <Button
+                buttonName={"Confirm"}
+                handleOnClick={handleCancelOrder}
+                // handleOnClick={onConfirm}
+              />
+
+              <Button
+                buttonName={"Cancel"}
+                handleOnClick={() => setShowRefundModal(false)}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

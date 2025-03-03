@@ -6,6 +6,9 @@ import { FaFacebookF } from "react-icons/fa6";
 import { FaTwitter, FaLinkedin } from "react-icons/fa";
 import { RiInstagramFill } from "react-icons/ri";
 import * as Yup from "yup";
+import { toast } from "react-toastify";
+import { sendContactUsMail } from "../api/message.api";
+import Button from "../components/button";
 
 export default function ContactUs() {
   return (
@@ -88,9 +91,6 @@ function ContactUsForm() {
     },
     validationSchema: Yup.object({
       name: Yup.string().required("Name is required"),
-      email: Yup.string()
-        .email("Invalid email address")
-        .required("Email is required"),
       message: Yup.string().required("Message is required"),
     }),
     onSubmit: async (values) => {
@@ -99,15 +99,15 @@ function ContactUsForm() {
   });
 
   const sendMessage = async (form) => {
-    // try {
-    //   const res = await sendContactUsMail(hotel_id, form, jwt);
-    //   console.log(res.data);
-    //   toast.success(res.data.message);
-    //   resetForm();
-    // } catch (e) {
-    //   console.log(e);
-    //   toast.error(e.response.data.message);
-    // }
+    try {
+      const res = await sendContactUsMail(form);
+      console.log(res.data);
+      toast.success(res.message);
+      resetForm();
+    } catch (e) {
+      console.log(e);
+      toast.error(e.response.data.message);
+    }
   };
 
   return (
@@ -129,26 +129,9 @@ function ContactUsForm() {
           <p className="text-red-600">{errors.name}</p>
         ) : null}
       </div>
-      <div className="flex-1 h-[6rem]">
-        <label htmlFor="email" className="block text-sm font-medium text-black">
-          Email
-        </label>
-        <input
-          type="email"
-          id="email"
-          name="email"
-          value={values.email}
-          onChange={handleChange}
-          onBlur={handleBlur}
-          className="pt-2 pb-2  border-b-2 border-gray-400  text-black w-full transition focus:border-black outline-none"
-        />
-        {touched.email && errors.email ? (
-          <p className="text-red-600">{errors.email}</p>
-        ) : null}
-      </div>
 
       <div className="flex w-full">
-        <div className="flex-1 h-[6rem]">
+        <div className="w-full">
           <label
             htmlFor="message"
             className="block text-sm font-medium text-black"
@@ -163,20 +146,15 @@ function ContactUsForm() {
             onChange={handleChange}
             onBlur={handleBlur}
             placeholder="Write your message..."
-            className=" pt-2 pb-2 border-b-2 border-gray-400  text-black w-full transition focus:border-black outline-none"
+            className=" pt-2 pb-10 border-b-2 border-gray-400  text-black w-full transition focus:border-black outline-none"
           />
           {touched.message && errors.message ? (
             <p className="text-red-600">{errors.message}</p>
           ) : null}
         </div>
       </div>
-      <div className="flex justify-end">
-        <button
-          type="submit"
-          className=" hover:scale-105 duration-300 ease-in w-fit p-3 rounded-md text-sm px-8 bg-gray-900 cursor-pointer text-white font-semibold"
-        >
-          <p>Send Message</p>
-        </button>
+      <div className="flex justify-end w-full ">
+        <Button buttonName="Send" type="submit" className="w-32 " />
       </div>
     </form>
   );

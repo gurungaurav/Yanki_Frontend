@@ -33,7 +33,7 @@ const UpdateProductPage = () => {
       description: Yup.string().required("Description is required"),
       stockQuantity: Yup.number().required("Quantity is required"),
       categoryId: Yup.string().required("Category is required"),
-      images: Yup.array().min(3, "At least three image is required"),
+      images: Yup.array().min(2, "At least two image is required"),
     }),
     onSubmit: async (values) => {
       handleSubmit(values);
@@ -68,9 +68,11 @@ const UpdateProductPage = () => {
     }
   };
 
+  console.log(formik.errors, "sdsdsd");
+
   const fetchCategories = async () => {
     try {
-      const data = await getCategories();
+      const data = await getCategories({ isDeleted: false });
       setAvailableCategories(data.data);
     } catch (error) {
       console.error("Failed to fetch categories:", error);
@@ -91,7 +93,7 @@ const UpdateProductPage = () => {
     }
   };
 
-  console.log(imagePreviews, "kaka");
+  // console.log(imagePreviews, "kaka");
 
   const handleRemoveImage = (index) => {
     const updatedPreviews = [...imagePreviews];
@@ -120,6 +122,8 @@ const UpdateProductPage = () => {
 
   const handleSubmit = async (values) => {
     try {
+      console.log("sdsdsd", values);
+
       const updatedValues = {};
       Object.keys(values).forEach((key) => {
         if (values[key] !== initialValues[key]) {

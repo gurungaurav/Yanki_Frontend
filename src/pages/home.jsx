@@ -11,7 +11,7 @@ export default function Home() {
 
   const fetchCategories = async () => {
     try {
-      const data = await getCategories();
+      const data = await getCategories({ isDeleted: false });
       setAvailableCategories(data.data);
       fetchProductsByCategory(data.data);
     } catch (error) {
