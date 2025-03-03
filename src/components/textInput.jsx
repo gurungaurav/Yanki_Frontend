@@ -12,7 +12,7 @@ const TextInput = ({
   const isError = formik.touched[name] && formik.errors[name];
 
   return (
-    <div className="flex h-[4rem] flex-col gap-1 w-full">
+    <div className="flex  flex-col gap-1 w-full ">
       <label htmlFor={name} className="text-sm text-gray-600 font-semibold">
         {label}
       </label>

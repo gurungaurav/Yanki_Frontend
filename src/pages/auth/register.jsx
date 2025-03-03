@@ -3,6 +3,8 @@ import * as Yup from "yup";
 import { RegisterUser } from "../../api/auth.api";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import TextInput from "../../components/textInput";
+import Button from "../../components/button";
 
 export default function RegistrationPage() {
   const navigate = useNavigate();
@@ -63,249 +65,70 @@ export default function RegistrationPage() {
     <div className="flex min-h-screen items-center justify-center  p-4">
       <form
         onSubmit={formik.handleSubmit}
-        className="w-full max-w-lg rounded-xl bg-white p-8 shadow-2xl backdrop-blur-lg border border-gray-200"
+        className="w-full max-w-2xl rounded-md bg-white p-8 shadow-md border border-gray-200 "
       >
         <h1 className="mb-8 text-center text-3xl font-bold text-gray-800">
           Create an Account
         </h1>
 
         <div className="flex gap-4">
-          {/* First Name */}
-          <div className="relative mb-6">
-            <label
-              htmlFor="firstName"
-              className="absolute -top-3 left-3 bg-white px-1 text-sm text-gray-600"
-            >
-              First Name
-            </label>
-            <input
-              className={`w-full rounded-lg border-2 p-3 text-gray-700 focus:ring-4 focus:ring-blue-300 ${
-                formik.touched.firstName && formik.errors.firstName
-                  ? "border-red-500"
-                  : "border-gray-300"
-              }`}
-              name="firstName"
-              id="firstName"
-              type="text"
-              placeholder="Enter your first name"
-              value={formik.values.firstName}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-            />
-            {formik.touched.firstName && formik.errors.firstName && (
-              <p className="mt-1 text-sm text-red-500">
-                {formik.errors.firstName}
-              </p>
-            )}
-          </div>
-
-          {/* Last Name */}
-          <div className="relative mb-6">
-            <label
-              htmlFor="lastName"
-              className="absolute -top-3 left-3 bg-white px-1 text-sm text-gray-600"
-            >
-              Last Name
-            </label>
-            <input
-              className={`w-full rounded-lg border-2 p-3 text-gray-700 focus:ring-4 focus:ring-blue-300 ${
-                formik.touched.lastName && formik.errors.lastName
-                  ? "border-red-500"
-                  : "border-gray-300"
-              }`}
-              name="lastName"
-              id="lastName"
-              type="text"
-              placeholder="Enter your last name"
-              value={formik.values.lastName}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-            />
-            {formik.touched.lastName && formik.errors.lastName && (
-              <p className="mt-1 text-sm text-red-500">
-                {formik.errors.lastName}
-              </p>
-            )}
-          </div>
+          <TextInput
+            label="First Name"
+            type="text"
+            name="firstName"
+            formik={formik}
+          />
+          <TextInput
+            label="Last Name"
+            type="text"
+            name="lastName"
+            formik={formik}
+          />
         </div>
 
         {/* Email */}
-        <div className="relative mb-6">
-          <label
-            htmlFor="email"
-            className="absolute -top-3 left-3 bg-white px-1 text-sm text-gray-600"
-          >
-            Email
-          </label>
-          <input
-            className={`w-full rounded-lg border-2 p-3 text-gray-700 focus:ring-4 focus:ring-blue-300 ${
-              formik.touched.email && formik.errors.email
-                ? "border-red-500"
-                : "border-gray-300"
-            }`}
-            name="email"
-            id="email"
-            type="email"
-            placeholder="Enter your email"
-            value={formik.values.email}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-          />
-          {formik.touched.email && formik.errors.email && (
-            <p className="mt-1 text-sm text-red-500">{formik.errors.email}</p>
-          )}
-        </div>
+        <TextInput label="Email" type="email" name="email" formik={formik} />
 
-        {/* Username */}
-        <div className="relative mb-6">
-          <label
-            htmlFor="username"
-            className="absolute -top-3 left-3 bg-white px-1 text-sm text-gray-600"
-          >
-            Username
-          </label>
-          <input
-            className={`w-full rounded-lg border-2 p-3 text-gray-700 focus:ring-4 focus:ring-blue-300 ${
-              formik.touched.username && formik.errors.username
-                ? "border-red-500"
-                : "border-gray-300"
-            }`}
-            name="username"
-            id="username"
+        <TextInput
+          label="Username"
+          type="text"
+          name="username"
+          formik={formik}
+        />
+
+        <div className="flex gap-4">
+          <TextInput
+            label="Phone Number"
             type="text"
-            placeholder="Choose a username"
-            value={formik.values.username}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-          />
-          {formik.touched.username && formik.errors.username && (
-            <p className="mt-1 text-sm text-red-500">
-              {formik.errors.username}
-            </p>
-          )}
-        </div>
-
-        {/* Password */}
-        <div className="relative mb-6">
-          <label
-            htmlFor="password"
-            className="absolute -top-3 left-3 bg-white px-1 text-sm text-gray-600"
-          >
-            Password
-          </label>
-          <input
-            className={`w-full rounded-lg border-2 p-3 text-gray-700 focus:ring-4 focus:ring-blue-300 ${
-              formik.touched.password && formik.errors.password
-                ? "border-red-500"
-                : "border-gray-300"
-            }`}
-            name="password"
-            id="password"
-            type="password"
-            placeholder="Enter your password"
-            value={formik.values.password}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-          />
-          {formik.touched.password && formik.errors.password && (
-            <p className="mt-1 text-sm text-red-500">
-              {formik.errors.password}
-            </p>
-          )}
-        </div>
-
-        {/* Confirm Password */}
-        <div className="relative mb-6">
-          <label
-            htmlFor="confirmPassword"
-            className="absolute -top-3 left-3 bg-white px-1 text-sm text-gray-600"
-          >
-            Confirm Password
-          </label>
-          <input
-            className={`w-full rounded-lg border-2 p-3 text-gray-700 focus:ring-4 focus:ring-blue-300 ${
-              formik.touched.confirmPassword && formik.errors.confirmPassword
-                ? "border-red-500"
-                : "border-gray-300"
-            }`}
-            name="confirmPassword"
-            id="confirmPassword"
-            type="password"
-            placeholder="Confirm your password"
-            value={formik.values.confirmPassword}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-          />
-          {formik.touched.confirmPassword && formik.errors.confirmPassword && (
-            <p className="mt-1 text-sm text-red-500">
-              {formik.errors.confirmPassword}
-            </p>
-          )}
-        </div>
-
-        {/* Phone Number */}
-        <div className="relative mb-6">
-          <label
-            htmlFor="phoneNumber"
-            className="absolute -top-3 left-3 bg-white px-1 text-sm text-gray-600"
-          >
-            Phone Number
-          </label>
-          <input
-            className={`w-full rounded-lg border-2 p-3 text-gray-700 focus:ring-4 focus:ring-blue-300 ${
-              formik.touched.phoneNumber && formik.errors.phoneNumber
-                ? "border-red-500"
-                : "border-gray-300"
-            }`}
             name="phoneNumber"
-            id="phoneNumber"
-            type="text"
-            placeholder="Enter your phone number"
-            value={formik.values.phoneNumber}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
+            formik={formik}
           />
-          {formik.touched.phoneNumber && formik.errors.phoneNumber && (
-            <p className="mt-1 text-sm text-red-500">
-              {formik.errors.phoneNumber}
-            </p>
-          )}
-        </div>
-
-        {/* Address */}
-        <div className="relative mb-8">
-          <label
-            htmlFor="address"
-            className="absolute -top-3 left-3 bg-white px-1 text-sm text-gray-600"
-          >
-            Address
-          </label>
-          <input
-            className={`w-full rounded-lg border-2 p-3 text-gray-700 focus:ring-4 focus:ring-blue-300 ${
-              formik.touched.address && formik.errors.address
-                ? "border-red-500"
-                : "border-gray-300"
-            }`}
+          <TextInput
+            label="Address"
+            type="text"
             name="address"
-            id="address"
-            type="text"
-            placeholder="Enter your address"
-            value={formik.values.address}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
+            formik={formik}
           />
-          {formik.touched.address && formik.errors.address && (
-            <p className="mt-1 text-sm text-red-500">{formik.errors.address}</p>
-          )}
         </div>
 
-        <button
-          type="submit"
-          // disabled={!formik.isValid || formik.isSubmitting}
-          className="w-full rounded-lg bg-gradient-to-r cursor-pointer bg-gray-800 duration-300 py-3 text-lg font-semibold text-white shadow-lg hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          Register
-        </button>
+        <TextInput
+          label="Password"
+          type="password"
+          name="password"
+          formik={formik}
+        />
+        <TextInput
+          label="Confirm Password"
+          type="password"
+          name="confirmPassword"
+          formik={formik}
+        />
+
+        <Button
+          type={"submit"}
+          className={"mt-6 w-full"}
+          buttonName={"Register"}
+        />
       </form>
     </div>
   );

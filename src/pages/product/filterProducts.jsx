@@ -6,14 +6,14 @@ import { getCategories } from "../../api/category.api";
 export default function FilterProductsPage() {
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [minPrice, setMinPrice] = useState(0);
-  const [maxPrice, setMaxPrice] = useState(2000);
+  const [maxPrice, setMaxPrice] = useState(10000);
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("All");
   const [availableCategories, setAvailableCategories] = useState([]);
 
   const fetchCategories = async () => {
     try {
-      const data = await getCategories();
+      const data = await getCategories({ isDeleted: false });
       setAvailableCategories(data.data);
     } catch (error) {
       console.error("Failed to fetch categories:", error);
@@ -105,7 +105,7 @@ export default function FilterProductsPage() {
 
           {/* Products Grid */}
           <div className="md:col-span-3">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2  gap-6">
               {filteredProducts.length ? (
                 filteredProducts.map((product) => <ProductCard {...product} />)
               ) : (

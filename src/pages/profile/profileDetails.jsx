@@ -63,10 +63,14 @@ export default function ProfileDetails() {
           <p>{user.address}</p>
         </div>
       </div>
-      <div className="pt-4">
+      <div className="pt-4 space-x-4">
         <Button
-          handleOnClick={() => navigate("/profile/update")}
+          handleOnClick={() => navigate("/profile/edit-profile")}
           buttonName={"Update Profile"}
+        ></Button>
+        <Button
+          handleOnClick={() => navigate("/profile/edit-password")}
+          buttonName={"Update Password"}
         ></Button>
       </div>
     </div>

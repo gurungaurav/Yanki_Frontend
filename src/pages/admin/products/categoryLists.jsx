@@ -6,6 +6,7 @@ import {
   getCategories,
   addCategory,
   updateCategory,
+  deleteCategory,
 } from "../../../api/category.api";
 import TextInput from "../../../components/textInput";
 import * as Yup from "yup";
@@ -13,10 +14,7 @@ import { useFormik } from "formik";
 import { toast } from "react-toastify";
 
 const CategoryListsPage = () => {
-  const navigate = useNavigate();
   const [availableCategories, setAvailableCategories] = useState([]);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [categoryToDelete, setCategoryToDelete] = useState(null);
   const [showAddCategoryModal, setShowAddCategoryModal] = useState(false);
   const [showUpdateCategoryModal, setShowUpdateCategoryModal] = useState(false);
   const [categoryToUpdate, setCategoryToUpdate] = useState(null);
@@ -55,25 +53,15 @@ const CategoryListsPage = () => {
     fetchCategories();
   }, []);
 
-  const deleteCategory = async (categoryId) => {
+  const deleteCategoryById = async (categoryId) => {
     try {
-      const data = await softDeleteProduct(categoryId, true); // soft delete
+      const data = await deleteCategory(categoryId); // soft delete
       console.log(data);
       fetchCategories(); // Refetch the data after deleting
-      setShowDeleteModal(false); // Close the modal
     } catch (error) {
+      toast.error(error.response.data.message);
       console.error("Failed to delete product:", error);
     }
-  };
-
-  const openDeleteModal = (categoryId) => {
-    setCategoryToDelete(categoryId);
-    setShowDeleteModal(true);
-  };
-
-  const closeDeleteModal = () => {
-    setCategoryToDelete(null);
-    setShowDeleteModal(false);
   };
 
   const openUpdateCategoryModal = (category) => {
@@ -135,6 +123,9 @@ const CategoryListsPage = () => {
                 Name
               </th>
               <th className="border border-gray-300 px-4 py-2 text-left font-semibold">
+                Status
+              </th>
+              <th className="border border-gray-300 px-4 py-2 text-left font-semibold">
                 Actions
               </th>
             </tr>
@@ -145,29 +136,30 @@ const CategoryListsPage = () => {
                 <td className="border border-gray-300 px-4 py-1">
                   {category.name}
                 </td>
+                <td className="border border-gray-300 px-4 py-1">
+                  {category.isDeleted ? "Deleted" : "Active"}
+                </td>
                 <td className="border border-gray-300 px-4 py-1 flex gap-2">
                   <Button
                     buttonName={"Update"}
                     handleOnClick={() => openUpdateCategoryModal(category)}
                   />
-                  <Button
-                    buttonName={"Delete"}
-                    handleOnClick={() => openDeleteModal(category._id)}
-                  />
+                  <button
+                    onClick={() => deleteCategoryById(category._id)}
+                    className={`p-2  cursor-pointer opacity-90 rounded-md duration-300 ${
+                      category.isDeleted
+                        ? "bg-green-500 text-white"
+                        : "bg-red-500 text-white"
+                    }`}
+                  >
+                    {category.isDeleted ? "Restore" : "Delete"}
+                  </button>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-
-      {/* Delete Confirmation Modal */}
-      <Modal
-        show={showDeleteModal}
-        onClose={closeDeleteModal}
-        onConfirm={() => deleteCategory(categoryToDelete)}
-        message={"Are you sure you want to delete this category?"}
-      />
 
       {/* Update Category Modal */}
       <Modal

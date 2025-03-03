@@ -1,11 +1,13 @@
 import { Star, ShoppingCart } from "lucide-react";
+import { FaStar } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { getAllProducts, getSpecificProduct } from "../../api/product.api";
-import { getProductReviews } from "../../api/reviews";
+import { addProductReviews, getProductReviews } from "../../api/reviews";
 import useCartStore from "../../store/useCartStore";
 import { toast } from "react-toastify";
 import ProductCard from "../../components/productCard";
+import useUserStore from "../../store/useUserStore";
 
 export default function ProductPage() {
   const params = useParams();
@@ -42,7 +44,7 @@ export default function ProductPage() {
           <p className="text-gray-600 mb-4">{product.categoryId.name}</p>
           <div className="flex items-center mb-4">
             {[...Array(5)].map((_, i) => (
-              <Star
+              <FaStar
                 key={i}
                 size={20}
                 className={
@@ -97,8 +99,11 @@ export default function ProductPage() {
 
 function ReviewSection({ productId }) {
   const [reviews, setReview] = useState(null);
+  const [reviewText, setReviewText] = useState("");
+  const [rating, setRating] = useState(0);
+  const { token } = useUserStore((state) => state.user);
 
-  const geReview = async () => {
+  const getReview = async () => {
     try {
       const response = await getProductReviews(productId, false);
       setReview(response.data);
@@ -109,40 +114,108 @@ function ReviewSection({ productId }) {
   };
 
   useEffect(() => {
-    geReview();
+    getReview();
   }, [productId]);
+
+  const handleReviewSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      if (!token) {
+        return toast.error("You need to login to add a review");
+      }
+
+      const response = await addProductReviews(
+        {
+          productId,
+          review: reviewText,
+          rating,
+        },
+        token
+      );
+      console.log(response);
+      toast.success(response.data.message);
+      setReviewText("");
+      setRating(0);
+      getReview(); // Refresh reviews after adding a new one
+    } catch (error) {
+      console.log(error);
+      toast.error(error.response.data.message);
+    }
+  };
 
   return (
     <section className="mb-16">
       <h2 className="text-2xl font-bold mb-6">Customer Reviews</h2>
       <div className="space-y-6">
-        {reviews?.map((review) => (
-          <div key={review?.id} className="border-b pb-4">
-            <div className="flex items-center mb-2">
-              <span className="font-semibold mr-2">
-                {review?.userId?.username}
-              </span>
-              <div className="flex mr-2">
-                {[...Array(5)].map((_, i) => (
-                  <Star
-                    key={i}
-                    size={16}
-                    className={
-                      i < review?.rating
-                        ? "text-yellow-400 fill-current"
-                        : "text-gray-300"
-                    }
-                  />
-                ))}
+        {reviews?.length === 0 ? (
+          <p className="text-gray-700">No reviews yet</p>
+        ) : (
+          reviews?.map((review) => (
+            <div key={review?.id} className="border-b pb-4 border-gray-300">
+              <div className="flex items-center mb-2">
+                <span className="font-semibold mr-2">
+                  {review?.userId?.username}
+                </span>
+                <div className="flex mr-2">
+                  {[...Array(5)].map((_, i) => (
+                    <FaStar
+                      key={i}
+                      size={16}
+                      className={
+                        i < review?.rating
+                          ? "text-yellow-400 fill-current"
+                          : "text-gray-300"
+                      }
+                    />
+                  ))}
+                </div>
+                <span className="text-sm text-gray-500">
+                  {new Date(review?.reviewDate).toLocaleDateString()}
+                </span>
               </div>
-              <span className="text-sm text-gray-500">
-                {review?.reviewDate}
-              </span>
+              <p className="text-gray-700">{review?.review}</p>
             </div>
-            <p className="text-gray-700">{review?.review}</p>
-          </div>
-        ))}
+          ))
+        )}
       </div>
+      <h2 className="text-2xl font-bold mt-8 mb-4">Add Your Review</h2>
+      <form onSubmit={handleReviewSubmit} className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700">
+            Rating
+          </label>
+          <div className="flex items-center mt-1">
+            {[...Array(5)].map((_, i) => (
+              <FaStar
+                key={i}
+                size={24}
+                className={`cursor-pointer ${
+                  i < rating ? "text-yellow-400" : "text-gray-300"
+                }`}
+                onClick={() => setRating(i + 1)}
+              />
+            ))}
+          </div>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700">
+            Review
+          </label>
+          <textarea
+            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-opacity-50"
+            rows="4"
+            value={reviewText}
+            onChange={(e) => setReviewText(e.target.value)}
+            required
+          ></textarea>
+        </div>
+        <button
+          type="submit"
+          className="bg-gray-900 hover:opacity-90 cursor-pointer text-white font-bold py-2 px-4 rounded-lg transition duration-300"
+        >
+          Submit Review
+        </button>
+      </form>
     </section>
   );
 }
@@ -172,11 +245,18 @@ function RelatedProducts({ productId, categoryId }) {
   return (
     <section className="mb-16">
       <h2 className="text-2xl font-bold mb-6">Related Products</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {relatedProducts?.map((product) => (
-          <ProductCard key={product.id} {...product} />
-        ))}
-      </div>
+
+      {relatedProducts?.length === 0 ? (
+        <div className="text-center">
+          <p className="text-2xl font-bold">No related products found</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {relatedProducts?.map((product) => (
+            <ProductCard key={product.id} {...product} />
+          ))}
+        </div>
+      )}
     </section>
   );
 }

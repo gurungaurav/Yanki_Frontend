@@ -140,10 +140,7 @@ const ProductListsPage = () => {
                 Reviews
               </th>
               <th className="border border-gray-300 px-4 py-2 text-left font-semibold">
-                Update
-              </th>
-              <th className="border border-gray-300 px-4 py-2 text-left font-semibold">
-                Deleted Status
+                Actions
               </th>
             </tr>
           </thead>
@@ -154,7 +151,7 @@ const ProductListsPage = () => {
                   <img
                     src={product.image}
                     alt={product.name}
-                    className="h-16 w-16 object-cover rounded-lg"
+                    className="h-16 w-2xs object-cover rounded-lg"
                   />
                 </td>
                 <td className="border border-gray-300 px-4 py-1">
@@ -183,27 +180,30 @@ const ProductListsPage = () => {
                     }
                   ></Button>
                 </td>
-                <td className="border border-gray-300 px-4 py-1">
-                  <Button
-                    buttonName={"Update"}
-                    handleOnClick={() =>
-                      navigate(
-                        `/dashboard/products/${product._id}/update-product`
-                      )
-                    }
-                  ></Button>
-                </td>
-                <td className="border border-gray-300 px-4 py-1">
-                  <button
-                    onClick={() => softDelete(product._id, !product.isDeleted)}
-                    className={`p-2  cursor-pointer opacity-90 rounded-md duration-300 ${
-                      product.isDeleted
-                        ? "bg-green-500 text-white"
-                        : "bg-red-500 text-white"
-                    }`}
-                  >
-                    {product.isDeleted ? "Restore" : "Delete"}
-                  </button>
+                <td className="border border-gray-300 px-4 py-1 ">
+                  <div className=" flex items-center gap-2 justify-center">
+                    <Button
+                      buttonName={"Update"}
+                      handleOnClick={() =>
+                        navigate(
+                          `/dashboard/products/${product._id}/update-product`
+                        )
+                      }
+                    ></Button>
+
+                    <button
+                      onClick={() =>
+                        softDelete(product._id, !product.isDeleted)
+                      }
+                      className={`p-2  cursor-pointer opacity-90 rounded-md duration-300 ${
+                        product.isDeleted
+                          ? "bg-green-500 text-white"
+                          : "bg-red-500 text-white"
+                      }`}
+                    >
+                      {product.isDeleted ? "Restore" : "Delete"}
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}

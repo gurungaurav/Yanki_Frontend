@@ -1,6 +1,8 @@
 import { cn } from "../lib/utils";
 
 const Button = ({ buttonName, handleOnClick, className, type, isDisabled }) => {
+  console.log(isDisabled, "isDisabled");
+
   return (
     <button
       onClick={handleOnClick}

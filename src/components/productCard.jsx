@@ -1,6 +1,8 @@
 import { ShoppingCart, Star } from "lucide-react";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import useCartStore from "../store/useCartStore";
+import { toast } from "react-toastify";
 
 export default function ProductCard({
   _id,
@@ -10,15 +12,32 @@ export default function ProductCard({
   price,
   image,
   hoverImage,
+  stockQuantity,
   rating,
   reviewsCount,
 }) {
   const [isImageHovered, setIsImageHovered] = useState(false);
+  const navigate = useNavigate();
+  const addItems = useCartStore((state) => state.addToCart);
+
+  const addToCart = (e) => {
+    e.stopPropagation(); // Stop event propagation
+    addItems({
+      id: _id,
+      name,
+      price,
+      availableQuantity: stockQuantity,
+      imageUrl: image,
+      quantity: 1,
+    });
+    toast.success("Product added to cart");
+  };
 
   return (
-    <Link
-      to={`/product/${_id}`}
-      className="bg-white rounded-lg shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl"
+    <div
+      onClick={() => navigate(`/product/${_id}`)}
+      // to={`/product/${_id}`}
+      className="bg-white rounded-md cursor-pointer shadow border border-gray-100 overflow-hidden transition-all duration-300 hover:shadow-md"
     >
       <div
         className="relative h-64 w-full cursor-pointer overflow-hidden"
@@ -53,11 +72,14 @@ export default function ProductCard({
           </span>
         </div>
         <p className="text-gray-700 mb-4 h-12 line-clamp-2">{description}</p>
-        <button className="w-full bg-black hover:bg-neutral-900 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center transition duration-300 transform  cursor-pointer">
+        <button
+          onClick={addToCart}
+          className="w-full bg-gray-900 hover:opacity-90 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center transition duration-300 transform  cursor-pointer"
+        >
           <ShoppingCart size={20} className="mr-2" />
           Add to Cart
         </button>
       </div>
-    </Link>
+    </div>
   );
 }

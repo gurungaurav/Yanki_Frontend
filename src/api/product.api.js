@@ -1,8 +1,6 @@
 import { axiosInstance } from "./index.api";
 
 export const getAllProducts = async (filters) => {
-  console.log(filters, "as");
-
   return (await axiosInstance.get("/product/getProducts", { params: filters }))
     .data;
 };

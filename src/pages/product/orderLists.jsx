@@ -9,7 +9,8 @@ import { useNavigate } from "react-router-dom";
 export default function OrderListPage() {
   const [orders, setOrders] = useState([]);
   const loggedInUser = useUserStore((state) => state.user);
-  const jwt = loggedInUser.token;
+  const jwt = loggedInUser?.token;
+
   const fetchOrders = async () => {
     try {
       const response = await getSpecificUserOrders(jwt);
@@ -65,7 +66,7 @@ const OrderCard = ({ order }) => {
     <div className=" rounded-md shadow overflow-hidden  bg-white pt-4 pb-8 px-5 m-4 border border-gray-200 w-full flex justify-between">
       <div>
         <div className="font-semibold text-lg mb-1">
-          {`Order #${order._id}`} <Badge status={order.orderStatus} />
+          {`Order #${order.orderId}`} <Badge status={order.orderStatus} />
         </div>
         <div className="text-gray-500 text-sm font-semibold mb-2 flex gap-3">
           <span className="flex gap-1 items-center">

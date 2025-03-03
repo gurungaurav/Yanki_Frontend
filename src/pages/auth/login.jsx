@@ -4,6 +4,8 @@ import * as Yup from "yup";
 import { LoginUser } from "../../api/auth.api";
 import useUserStore from "../../store/useUserStore";
 import { useNavigate } from "react-router-dom";
+import TextInput from "../../components/textInput";
+import Button from "../../components/button";
 
 export default function LoginPage() {
   const setUser = useUserStore((state) => state.setUser);
@@ -66,69 +68,29 @@ export default function LoginPage() {
         </h1>
 
         {/* Email Input */}
-        <div className="relative mb-6">
-          <label
-            htmlFor="email"
-            className="absolute -top-3 left-3 bg-white px-1 text-sm text-gray-600"
-          >
-            Email
-          </label>
-          <input
-            className={`w-full rounded-lg border-2 p-3 text-gray-700 focus:ring-4 focus:ring-blue-300 ${
-              formik.touched.email && formik.errors.email
-                ? "border-red-500"
-                : "border-gray-300"
-            }`}
-            name="email"
-            id="email"
-            type="email"
-            placeholder="Enter your email"
-            value={formik.values.email}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-          />
-          {formik.touched.email && formik.errors.email && (
-            <p className="mt-1 text-sm text-red-500">{formik.errors.email}</p>
-          )}
-        </div>
+        <TextInput
+          label="Email"
+          type="email"
+          name="email"
+          formik={formik}
+          placeholder="Enter your email"
+        />
 
         {/* Password Input */}
-        <div className="relative mb-8">
-          <label
-            htmlFor="password"
-            className="absolute -top-3 left-3 bg-white px-1 text-sm text-gray-600"
-          >
-            Password
-          </label>
-          <input
-            className={`w-full rounded-lg border-2 p-3 text-gray-700 focus:ring-4 focus:ring-blue-300 ${
-              formik.touched.password && formik.errors.password
-                ? "border-red-500"
-                : "border-gray-300"
-            }`}
-            name="password"
-            id="password"
-            type="password"
-            placeholder="Enter your password"
-            value={formik.values.password}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-          />
-          {formik.touched.password && formik.errors.password && (
-            <p className="mt-1 text-sm text-red-500">
-              {formik.errors.password}
-            </p>
-          )}
-        </div>
+        <TextInput
+          label="Password"
+          type="password"
+          name="password"
+          formik={formik}
+          placeholder="Enter your password"
+        />
 
         {/* Submit Button */}
-        <button
+        <Button
           type="submit"
-          className="w-full rounded-lg bg-gradient-to-r cursor-pointer bg-gray-800 duration-300 py-3 text-lg font-semibold text-white shadow-lg hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
-          //   disabled={!formik.isValid || formik.isSubmitting}
-        >
-          {formik.isSubmitting ? "Logging in..." : "Login"}
-        </button>
+          className={"mt-6 w-full"}
+          buttonName={formik.isSubmitting ? "Loading..." : "Login"}
+        />
 
         {/* Additional Links */}
         <div className="mt-6 text-center">

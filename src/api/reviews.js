@@ -10,14 +10,16 @@ export const getProductReviews = async (productId, isDeleted) => {
   ).data;
 };
 
-export const addProductReviews = async (review) => {
-  return (await axiosInstance.post(`/review/addReview`, review)).data;
-};
+export const addProductReviews = async (review, jwt) => {
+  console.log(review, "review", jwt, "jwt");
 
-export const softDeleteProductReviews = async (reviewId, isDeleted) => {
   return (
-    await axiosInstance.patch(`/review/deleteReview/${reviewId}`, {
-      isDeleted,
+    await axiosInstance.post(`/review/addReview`, review, {
+      headers: { Authorization: `Bearer ${jwt}` },
     })
   ).data;
+};
+
+export const softDeleteProductReviews = async (reviewId) => {
+  return (await axiosInstance.delete(`/review/deleteReview/${reviewId}`)).data;
 };

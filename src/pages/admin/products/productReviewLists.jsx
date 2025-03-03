@@ -23,11 +23,9 @@ const ProductReviewListsPage = () => {
     filterReviews();
   }, []);
 
-  const softDelete = async (reviewId, isDeleted) => {
+  const softDelete = async (reviewId) => {
     try {
-      console.log(reviewId, isDeleted, "lalalal");
-
-      const data = await softDeleteProductReviews(reviewId, isDeleted);
+      const data = await softDeleteProductReviews(reviewId);
       console.log(data);
       filterReviews(); // Refetch the data after toggling the deleted status
     } catch (error) {
@@ -78,7 +76,7 @@ const ProductReviewListsPage = () => {
 
                 <td className="border border-gray-300 px-4 py-1">
                   <button
-                    onClick={() => softDelete(review._id, !review.isDeleted)}
+                    onClick={() => softDelete(review._id)}
                     className={`p-2 cursor-pointer opacity-90 rounded-md duration-300 ${
                       review.isDeleted
                         ? "bg-green-500 text-white"

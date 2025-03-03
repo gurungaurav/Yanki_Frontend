@@ -37,7 +37,7 @@ const AddProductPage = () => {
 
   const fetchCategories = async () => {
     try {
-      const data = await getCategories();
+      const data = await getCategories({ isDeleted: false });
       setAvailableCategories(data.data);
       formik.setFieldValue("categoryId", data.data[0]._id);
     } catch (error) {

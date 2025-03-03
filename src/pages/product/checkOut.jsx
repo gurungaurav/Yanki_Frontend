@@ -29,8 +29,7 @@ export default function CheckOutPage() {
       lastName: Yup.string().required("Last name is required"),
       address: Yup.string().required("Address is required"),
       phoneNumber: Yup.string()
-        .max(10, "Phone number must be at least 10 digits")
-        .min(10, "Phone number must be at least 10 digits")
+        .length(10, "Phone number must be exactly 10 digits")
         .required("Phone number is required"),
     }),
     onSubmit: (values) => {
@@ -70,12 +69,22 @@ export default function CheckOutPage() {
           quantity: item.quantity,
           price: item.price,
         })),
+        paymentMethod,
         totalPrice: calculateTotal(),
         website_url: "http://localhost:5000",
       };
 
       const data = await placeOrder(initialValues, loggedUser.token);
       clearCart();
+      if (paymentMethod === "cod") {
+        console.log("sdsdsd");
+
+        toast.success(data.message);
+        navigate(
+          `/product/order-details?purchase_order_id=${data.data.orderId}`
+        );
+        return;
+      }
       window.location.href = data.data.payment_url;
       console.log(data.data, "sdsdsds");
     } catch (error) {
