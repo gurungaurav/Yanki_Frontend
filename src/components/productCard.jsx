@@ -1,6 +1,6 @@
-import { ShoppingCart, Star } from "lucide-react";
+import { ShoppingCart } from "lucide-react";
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import useCartStore from "../store/useCartStore";
 import { toast } from "react-toastify";
 
@@ -13,8 +13,6 @@ export default function ProductCard({
   image,
   hoverImage,
   stockQuantity,
-  rating,
-  reviewsCount,
 }) {
   const [isImageHovered, setIsImageHovered] = useState(false);
   const navigate = useNavigate();
@@ -65,7 +63,7 @@ export default function ProductCard({
         <div className="flex justify-between items-start mb-2">
           <div>
             <h3 className="text-lg font-semibold mb-1">{name}</h3>
-            <p className="text-sm text-gray-600">{categoryId.name}</p>
+            <p className="text-sm text-gray-600">{categoryId?.name}</p>
           </div>
           <span className="text-base font-semibold text-gray-900">
             NPR {price}
@@ -74,7 +72,7 @@ export default function ProductCard({
         <p className="text-gray-700 mb-4 h-12 line-clamp-2">{description}</p>
         <button
           onClick={addToCart}
-          className="w-full bg-gray-900 hover:opacity-90 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center transition duration-300 transform  cursor-pointer"
+          className="w-full bg-gray-900 hover:opacity-90 text-white font-semibold py-3 px-4 rounded-lg flex items-center justify-center transition duration-300 transform  cursor-pointer"
         >
           <ShoppingCart size={20} className="mr-2" />
           Add to Cart

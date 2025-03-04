@@ -84,8 +84,6 @@ export default function OrderDetailsPage() {
   };
 
   const processPayment = async () => {
-    console.log(totalAmount, "totalAmount");
-
     try {
       const initialValues = {
         purchase_order_id,
@@ -95,7 +93,6 @@ export default function OrderDetailsPage() {
 
       const data = await placeOrder(initialValues, loggedUser.token);
       window.location.href = data.data.payment_url;
-      console.log(data.data, "sdsdsds");
     } catch (error) {
       console.error("Failed to place order:", error);
       toast.error(error.response?.data?.message);
@@ -135,7 +132,7 @@ export default function OrderDetailsPage() {
     <div className="h-full ">
       <main className="container mx-auto px-4 py-12 w-full">
         <div className="flex gap-8 justify-center">
-          <div className="mb-8 bg-white shadow rounded-md p-4  w-xl border border-gray-100">
+          <div className="mb-8 bg-white shadow rounded-md p-4  w-xl border border-gray-100 h-fit">
             <div className="pb-4 border-b mb-4 border-gray-300">
               <div className="flex justify-between items-start">
                 <div>
