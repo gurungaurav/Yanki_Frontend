@@ -24,8 +24,6 @@ export default function FilterProductsPage() {
     fetchCategories();
   }, []);
 
-  console.log(category);
-
   useEffect(() => {
     const filterProduct = async () => {
       const filters = { isDeleted: false };
@@ -36,7 +34,6 @@ export default function FilterProductsPage() {
         filters.minPrice = minPrice || 0;
         filters.maxPrice = maxPrice || 0;
       }
-      console.log(filters);
 
       try {
         const data = await getAllProducts(filters);
@@ -61,7 +58,7 @@ export default function FilterProductsPage() {
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full rounded-lg border p-3 text-gray-700"
+                className="w-full rounded-md border p-2 "
               />
             </div>
 
@@ -89,15 +86,15 @@ export default function FilterProductsPage() {
                   value={minPrice}
                   onChange={(e) => setMinPrice(e.target.value)}
                   placeholder="Min"
-                  className="w-full rounded-lg border p-3 text-gray-700"
+                  className="w-full rounded-md border p-3 text-gray-700"
                 />
-                <span>to</span>
+                <span>-</span>
                 <input
                   type="number"
                   value={maxPrice}
                   onChange={(e) => setMaxPrice(e.target.value)}
                   placeholder="Max"
-                  className="w-full rounded-lg border p-3 text-gray-700"
+                  className="w-full rounded-md border p-3 text-gray-700"
                 />
               </div>
             </div>

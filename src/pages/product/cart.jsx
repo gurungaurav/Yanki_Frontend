@@ -66,59 +66,66 @@ export default function CartPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 h-full">
-      <h1 className="text-2xl font-bold mb-8">Your Cart</h1>
+    <div className="container mx-auto px-4 py-16 h-full">
+      <h1 className="text-3xl font-bold mb-8">Your Cart</h1>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 ">
         <div className="md:col-span-2">
           <div className="space-y-4">
             {cartItems.map((item) => (
               <div
                 key={item.id}
-                className="flex items-center space-x-4 border-b border-b-gray-300 pb-4"
+                className="flex items-center justify-between gap-2  border-b border-b-gray-300 pb-4"
               >
-                <img
-                  src={item.imageUrl || "/placeholder.svg"}
-                  alt={item.name}
-                  className="rounded-md w-16 h-16 object-cover"
-                />
-                <div className="flex-grow">
-                  <h3 className="font-semibold">{item.name}</h3>
-                  <p className="text-sm text-gray-500">
-                    Available Quantity: {item.availableQuantity}
-                  </p>
-                  <p className="text-sm text-gray-500">NPR {item.price}</p>
-                </div>
-                <div className="flex items-center border rounded-lg mr-4">
-                  <button
-                    className="px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-l-lg cursor-pointer"
-                    onClick={() => decreaseQuantity(item.id)}
-                  >
-                    -
-                  </button>
-                  <input
-                    type="number"
-                    disabled
-                    value={item.quantity}
-                    className="w-16 px-3 py-2 text-center"
-                  />
-                  <button
-                    className="px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-r-lg cursor-pointer"
-                    onClick={() => increaseQuantity(item.id)}
-                  >
-                    +
-                  </button>
-                </div>
-                <button
-                  className="p-2 hover:bg-gray-200 rounded-md duration-300 cursor-pointer"
-                  onClick={() => removeItem(item.id)}
+                <div
+                  className="flex gap-4 items-center w-full hover:bg-gray-100 duration-300 cursor-pointer rounded-md"
+                  onClick={() => naviagte(`/product/${item.id}`)}
                 >
-                  <Trash2 className="h-4 w-4" />
-                </button>
+                  <img
+                    src={item.imageUrl || "/placeholder.svg"}
+                    alt={item.name}
+                    className="rounded-md w-32 h-28 object-cover"
+                  />
+                  <div className="flex-grow">
+                    <h3 className="font-semibold">{item.name}</h3>
+                    <p className="text-sm text-gray-500">
+                      Available Quantity: {item.availableQuantity}
+                    </p>
+                    <p className="text-sm text-gray-500">NPR {item.price}</p>
+                  </div>
+                </div>
+                <div className="flex items-center ">
+                  <div className="flex items-center border rounded-md mr-4">
+                    <button
+                      className="px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-l-md cursor-pointer"
+                      onClick={() => decreaseQuantity(item.id)}
+                    >
+                      -
+                    </button>
+                    <input
+                      type="number"
+                      disabled
+                      value={item.quantity}
+                      className="w-16 px-3 py-2 text-center"
+                    />
+                    <button
+                      className="px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-r-md cursor-pointer"
+                      onClick={() => increaseQuantity(item.id)}
+                    >
+                      +
+                    </button>
+                  </div>
+                  <button
+                    className="p-2 hover:bg-gray-200 rounded-md duration-300 cursor-pointer"
+                    onClick={() => removeItem(item.id)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </div>
               </div>
             ))}
           </div>
         </div>
-        <div className=" p-6 rounded-md border border-gray-100 shadow">
+        <div className=" p-6 rounded-md border border-gray-200 shadow h-fit">
           <h2 className="text-lg font-semibold pb-2 border-b border-b-gray-300">
             Cart Summary
           </h2>

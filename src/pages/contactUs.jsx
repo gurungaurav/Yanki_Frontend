@@ -3,7 +3,6 @@ import { HiLocationMarker } from "react-icons/hi";
 import { useFormik } from "formik";
 import { BiSolidPhoneCall } from "react-icons/bi";
 import { FaFacebookF } from "react-icons/fa6";
-import { FaTwitter, FaLinkedin } from "react-icons/fa";
 import { RiInstagramFill } from "react-icons/ri";
 import * as Yup from "yup";
 import { toast } from "react-toastify";
@@ -21,10 +20,10 @@ export default function ContactUs() {
           </p>
         </div>
         <div className=" flex items-center justify-center rounded-lg shadow-md border border-gray-200 h-[34rem] ">
-          <div className="w-[40%] h-full flex flex-col gap-24 p-8 px-10 bg-gray-900 rounded-l-lg text-white">
+          <div className="w-[40%] h-full flex flex-col gap-24 p-8 px-10 bg-gray-900 rounded-l-md text-white">
             <div>
               <h2 className="text-[28px] font-semibold">Contact Information</h2>
-              <p className="text-md mt-2">Say something to start a live chat</p>
+              {/* <p className="text-md mt-2">Say something to start a live chat</p> */}
             </div>
             <div className="flex flex-col gap-12">
               <div className="flex text-md items-center gap-5">
@@ -41,9 +40,6 @@ export default function ContactUs() {
               </div>
             </div>
             <div className="flex gap-3">
-              <div className="border-2 border-white rounded-full p-2   hover:bg-white ease-in duration-500 hover:text-black cursor-pointer">
-                <FaTwitter className="text-xl " />
-              </div>
               <div
                 onClick={() =>
                   window.open("https://www.facebook.com", "_blank")
@@ -52,9 +48,7 @@ export default function ContactUs() {
               >
                 <FaFacebookF className="text-xl" />
               </div>
-              <div className="border-2 border-white rounded-full p-2 hover:bg-white ease-in duration-500 hover:text-black cursor-pointer">
-                <FaLinkedin className="text-xl" />
-              </div>
+
               <div
                 onClick={() =>
                   window.open("https://www.instagram.com", "_blank")

@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { FaCartPlus, FaUser } from "react-icons/fa";
+import { FaShoppingCart } from "react-icons/fa";
 import useUserStore from "../store/useUserStore";
+import yanki from "../assets/yanki-.png";
+import { FaRegUser } from "react-icons/fa6";
 
 export default function Navbar() {
   const user = useUserStore((state) => state.user);
@@ -40,9 +42,13 @@ export default function Navbar() {
   };
 
   return (
-    <div className="sticky top-0 z-50 flex items-center justify-between shadow bg-white px-5 py-4 sm:px-10 md:px-20">
-      <Link to="/" className="h-[3rem] w-[6rem] md:h-[4rem] md:w-[8rem]">
-        <h1>Yanki</h1>
+    <div className="sticky top-0 z-50 flex items-center justify-between shadow bg-white px-5 py-2 sm:px-10 md:px-20 brder-b border-gray-200">
+      <Link to="/" className=" ">
+        <img
+          className="w-[5rem] h-[5rem] object-cover"
+          src={yanki}
+          alt="logo"
+        />
       </Link>
 
       <div className="flex gap-10">
@@ -52,8 +58,8 @@ export default function Navbar() {
             to={nav.link}
             className={`${
               location.pathname === nav.link &&
-              "border-b-2 border-black font-semibold"
-            }`}
+              "border-b-2 border-black font-semibold "
+            } hover:font-semibold duration-300`}
           >
             {nav.name}
           </Link>
@@ -62,19 +68,23 @@ export default function Navbar() {
 
       <div className="flex w-[20rem] items-center justify-end">
         <div className="relative flex items-center gap-4 text-2xl">
+          <FaShoppingCart
+            onClick={() => navigate("/product/cart")}
+            className="cursor-pointer  hover:text-neutral-600 duration-300"
+          />
           <div
             onClick={handleDropdownToggle}
             className="rounded-full bg-gray-200 w-10 h-10 p-2 flex items-center justify-center cursor-pointer"
           >
             {user ? (
-              <p className="text-base">{user.username[0]}</p>
+              <p className="text-base">{user.username[0]?.toUpperCase()}</p>
             ) : (
-              <FaUser className="text-xl" />
+              <FaRegUser className="text-xl" />
             )}
           </div>
 
           {isDropdownOpen && (
-            <div className="absolute right-0 mt-40 w-40 bg-white shadow-md rounded-md border border-gray-200">
+            <div className="absolute -left-10 mt-40 w-40 bg-white shadow-md rounded-md border border-gray-200">
               <ul className="text-sm">
                 {user ? (
                   <>
@@ -116,11 +126,6 @@ export default function Navbar() {
               </ul>
             </div>
           )}
-
-          <FaCartPlus
-            onClick={() => navigate("/product/cart")}
-            className="cursor-pointer"
-          />
         </div>
       </div>
     </div>

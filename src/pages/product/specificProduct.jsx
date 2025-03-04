@@ -1,4 +1,4 @@
-import { Star, ShoppingCart } from "lucide-react";
+import { ShoppingCart } from "lucide-react";
 import { FaStar } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
@@ -17,7 +17,6 @@ export default function ProductPage() {
     try {
       const response = await getSpecificProduct(params?.id);
       setProduct(response.data);
-      console.log(response);
     } catch (error) {
       console.log(error);
     }
@@ -29,8 +28,8 @@ export default function ProductPage() {
 
   if (!product) {
     return (
-      <div className="container mx-auto px-4 py-8 text-center">
-        <p className="text-2xl font-bold">Loading...</p>
+      <div className=" mx-auto px-4 my-44 text-center">
+        <p className="text-2xl font-bold">No product found</p>
       </div>
     );
   }
@@ -64,27 +63,6 @@ export default function ProductPage() {
           <p className="text-sm  mb-4">Quantity: {product.stockQuantity}</p>
           <p className="text-gray-700 mb-6">{product.description}</p>
           <AddToCartSection {...product} />
-          {/* <div className="mt-8">
-            <h2 className="text-xl font-semibold mb-4">Key Features:</h2>
-            <ul className="list-disc list-inside mb-6">
-              {product.features.map((feature, index) => (
-                <li key={index} className="text-gray-700 mb-2">
-                  {feature}
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div className="mt-8">
-            <h2 className="text-xl font-semibold mb-4">Specifications:</h2>
-            <div className="grid grid-cols-2 gap-4">
-              {product.specifications.map((spec, index) => (
-                <div key={index} className="mb-2">
-                  <span className="font-semibold">{spec.name}:</span>{" "}
-                  {spec.value}
-                </div>
-              ))}
-            </div>
-          </div> */}
         </div>
       </div>
 
@@ -101,13 +79,13 @@ function ReviewSection({ productId }) {
   const [reviews, setReview] = useState(null);
   const [reviewText, setReviewText] = useState("");
   const [rating, setRating] = useState(0);
-  const { token } = useUserStore((state) => state.user);
+  const userStore = useUserStore((state) => state?.user);
+  const token = userStore?.token;
 
   const getReview = async () => {
     try {
       const response = await getProductReviews(productId, false);
       setReview(response.data);
-      console.log(response);
     } catch (error) {
       console.log(error);
     }
@@ -132,20 +110,20 @@ function ReviewSection({ productId }) {
         },
         token
       );
-      console.log(response);
       toast.success(response.data.message);
       setReviewText("");
       setRating(0);
       getReview(); // Refresh reviews after adding a new one
     } catch (error) {
-      console.log(error);
       toast.error(error.response.data.message);
     }
   };
 
   return (
-    <section className="mb-16">
-      <h2 className="text-2xl font-bold mb-6">Customer Reviews</h2>
+    <section className="my-20">
+      <h2 className="text-2xl font-bold mb-4 pb-4 border-b border-gray-300">
+        Customer Reviews
+      </h2>
       <div className="space-y-6">
         {reviews?.length === 0 ? (
           <p className="text-gray-700">No reviews yet</p>
@@ -178,7 +156,9 @@ function ReviewSection({ productId }) {
           ))
         )}
       </div>
-      <h2 className="text-2xl font-bold mt-8 mb-4">Add Your Review</h2>
+      <h2 className="text-2xl font-bold mt-8 mb-4 pb-4 border-b border-gray-300">
+        Add Your Review
+      </h2>
       <form onSubmit={handleReviewSubmit} className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-gray-700">
@@ -211,7 +191,7 @@ function ReviewSection({ productId }) {
         </div>
         <button
           type="submit"
-          className="bg-gray-900 hover:opacity-90 cursor-pointer text-white font-bold py-2 px-4 rounded-lg transition duration-300"
+          className="bg-gray-900 hover:opacity-90 cursor-pointer text-white font-semibold text-sm py-2 px-4 rounded-lg transition duration-300"
         >
           Submit Review
         </button>
@@ -221,8 +201,6 @@ function ReviewSection({ productId }) {
 }
 
 function RelatedProducts({ productId, categoryId }) {
-  console.log("Related Products", productId, categoryId);
-
   const [relatedProducts, setRelatedProducts] = useState([]);
 
   const getRelatedProducts = async () => {
@@ -244,11 +222,13 @@ function RelatedProducts({ productId, categoryId }) {
 
   return (
     <section className="mb-16">
-      <h2 className="text-2xl font-bold mb-6">Related Products</h2>
+      <h2 className="text-2xl font-bold mb-6 pb-4 border-b border-gray-300">
+        Related Products
+      </h2>
 
       {relatedProducts?.length === 0 ? (
         <div className="text-center">
-          <p className="text-2xl font-bold">No related products found</p>
+          <p className="text-2xl font-bold mt-10">No related products found</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -263,6 +243,10 @@ function RelatedProducts({ productId, categoryId }) {
 
 function ProductGallery({ images }) {
   const [mainImage, setMainImage] = useState(images[0].imageUrl);
+
+  useEffect(() => {
+    setMainImage(images[0].imageUrl);
+  }, [images]);
 
   return (
     <div>
@@ -341,9 +325,9 @@ function AddToCartSection({ _id, name, price, stockQuantity, images }) {
 
   return (
     <div className="flex items-center mb-6">
-      <div className="flex items-center border rounded-lg mr-4">
+      <div className="flex items-center border rounded-md mr-4">
         <button
-          className="px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-l-lg cursor-pointer"
+          className="px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-l-md cursor-pointer"
           onClick={decreaseQuantity}
         >
           -
@@ -357,7 +341,7 @@ function AddToCartSection({ _id, name, price, stockQuantity, images }) {
           className="w-16 px-3 py-2 text-center"
         />
         <button
-          className="px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-r-lg cursor-pointer"
+          className="px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-r-md cursor-pointer"
           onClick={increaseQuantity}
         >
           +
@@ -365,7 +349,7 @@ function AddToCartSection({ _id, name, price, stockQuantity, images }) {
       </div>
       <button
         onClick={addToCart}
-        className="bg-gray-900 hover:opacity-90 cursor-pointer text-white font-bold py-3 px-6 rounded-lg flex items-center justify-center transition duration-300"
+        className="bg-gray-900 hover:opacity-90 cursor-pointer text-white font-bold py-3 px-6 rounded-md flex items-center justify-center transition duration-300"
       >
         <ShoppingCart size={20} className="mr-2" />
         Add to Cart

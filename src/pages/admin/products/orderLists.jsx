@@ -3,6 +3,7 @@ import Button from "../../../components/button";
 import { useEffect, useState } from "react";
 import { getOrdersAdmin, updateOrderStatus } from "../../../api/order.api";
 import useUserStore from "../../../store/useUserStore";
+import { Badge } from "../../../components/badge";
 
 const OrderListsPage = () => {
   const navigate = useNavigate();
@@ -73,6 +74,9 @@ const OrderListsPage = () => {
                 Date
               </th>
               <th className="border border-gray-300 px-4 py-2 text-left font-semibold">
+                Payment Method
+              </th>
+              <th className="border border-gray-300 px-4 py-2 text-left font-semibold">
                 Status
               </th>
               <th className="border border-gray-300 px-4 py-2 text-left font-semibold">
@@ -96,7 +100,12 @@ const OrderListsPage = () => {
                   {new Date(order.orderDate).toLocaleDateString()}
                 </td>
                 <td className="border border-gray-300 px-4 py-2">
-                  {order.orderStatus}
+                  {order?.orderStatus == "cancelled"
+                    ? "Refunded"
+                    : order.paymentMethod}
+                </td>
+                <td className="border border-gray-300 px-4 py-2">
+                  <Badge status={order.orderStatus} />
                 </td>
                 <td className="border border-gray-300 px-4 py-2">
                   NPR {order.totalAmount}

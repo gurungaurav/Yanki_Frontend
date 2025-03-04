@@ -20,12 +20,12 @@ const UpdateProductPage = () => {
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: {
-      name: product.name || "",
-      price: product.price || "",
-      description: product.description || "",
-      stockQuantity: product.stockQuantity || 0,
-      categoryId: product.categoryId?._id || "",
-      images: product.images || [],
+      name: "",
+      price: "",
+      description: "",
+      stockQuantity: 0,
+      categoryId: "",
+      images: [],
     },
     validationSchema: Yup.object({
       name: Yup.string().required("Product name is required"),
@@ -62,7 +62,12 @@ const UpdateProductPage = () => {
       };
       setInitialValues(initialFormValues);
       formik.setValues(initialFormValues);
-      setImagePreviews(response.data.images.map((image) => image.imageUrl));
+      setImagePreviews(
+        response.data.images.map((image) => ({
+          imageUrl: image.imageUrl,
+          _id: image._id,
+        }))
+      );
     } catch (error) {
       console.error("Failed to fetch product:", error);
     }
@@ -88,7 +93,10 @@ const UpdateProductPage = () => {
         ...uploadedFiles,
       ]);
       // Generate previews for each uploaded file
-      const previews = uploadedFiles.map((file) => URL.createObjectURL(file));
+      const previews = uploadedFiles.map((file) => ({
+        imageUrl: URL.createObjectURL(file),
+        _id: null, // New images do not have an ID yet
+      }));
       setImagePreviews((prevPreviews) => [...prevPreviews, ...previews]);
     }
   };
@@ -97,23 +105,19 @@ const UpdateProductPage = () => {
 
   const handleRemoveImage = (index) => {
     const updatedPreviews = [...imagePreviews];
-    updatedPreviews.splice(index, 1);
+    const removedImage = updatedPreviews.splice(index, 1)[0];
     setImagePreviews(updatedPreviews);
 
-    if (index < product.images.length) {
-      // If the image is from the existing product, mark it for removal
-      setRemovedImageIds((prevIds) => [
-        ...prevIds,
-        { _id: product.images[index]._id },
-      ]);
+    if (removedImage._id) {
+      // The image is from the existing product (product.images), so we need to mark it for deletion
+      setRemovedImageIds((prevIds) => [...prevIds, removedImage._id]);
     } else {
-      // If the image is newly uploaded, remove it from newImages
-      setNewImages((prevImages) =>
-        prevImages.filter((_, i) => i !== index - product.images.length)
-      );
+      // The image is a newly uploaded image (newImages), so we just remove it from newImages
+      const newIndex = index - product.images.length;
+      setNewImages((prevImages) => prevImages.filter((_, i) => i !== newIndex));
     }
 
-    // Update Formik's images field
+    // Update Formik's images field by removing the image at the index
     formik.setFieldValue(
       "images",
       formik.values.images.filter((_, i) => i !== index)
@@ -142,17 +146,9 @@ const UpdateProductPage = () => {
         formData.append("images", image);
       });
 
-      formData.append(
-        "imagesToDelete",
-        JSON.stringify(removedImageIds.map((item) => item._id))
-      );
-
-      console.log("Form data:", formData.get("images"));
-      console.log("Form data:", formData.get("imagesToDelete"));
-
+      formData.append("imagesToDelete", JSON.stringify(removedImageIds));
       const response = await updateProduct(productId, formData);
-      toast.success("Product updated successfully!");
-      console.log("Updated product:", response.data);
+      toast.success(response.message);
     } catch (error) {
       console.error("Failed to update product:", error);
       toast.error(error.response?.data?.message || "Failed to update product");
@@ -270,11 +266,7 @@ const UpdateProductPage = () => {
             <div key={index} className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <img
-                  src={
-                    typeof image === "string"
-                      ? image
-                      : URL.createObjectURL(image)
-                  }
+                  src={image.imageUrl}
                   alt={`Preview ${index}`}
                   className="w-12 h-12 object-cover rounded"
                 />

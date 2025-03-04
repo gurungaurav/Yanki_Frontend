@@ -53,7 +53,7 @@ export default function Home() {
     <div className="min-h-screen flex flex-col">
       <main className="flex-grow bg-gray-50">
         <Hero />
-        <section className="py-16 bg-white">
+        <section className="pt-20 bg-white">
           <div className="container mx-auto px-4">
             <h2 className="text-3xl font-bold text-center mb-12">
               New Arrivals
@@ -69,7 +69,7 @@ export default function Home() {
           <section
             key={category._id}
             id={`category-${category._id}`}
-            className="py-16 bg-white"
+            className="pt-20 bg-white"
           >
             <div className="container mx-auto px-4">
               <h2 className="text-3xl font-bold text-center mb-12">

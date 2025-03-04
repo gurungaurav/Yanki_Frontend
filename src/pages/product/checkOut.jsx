@@ -86,9 +86,7 @@ export default function CheckOutPage() {
         return;
       }
       window.location.href = data.data.payment_url;
-      console.log(data.data, "sdsdsds");
     } catch (error) {
-      console.error("Failed to place order:", error);
       toast.error(error.response?.data?.message);
     }
   };

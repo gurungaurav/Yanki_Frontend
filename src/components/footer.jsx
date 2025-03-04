@@ -1,5 +1,5 @@
-import { Scissors } from "lucide-react";
 import { Link } from "react-router-dom";
+import yanki from "../assets/yanki-.png";
 
 export default function Footer() {
   return (
@@ -7,10 +7,12 @@ export default function Footer() {
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
-            <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
-              <Scissors className="h-5 w-5" />
-              BarberSupply
-            </h3>
+            <img
+              src={yanki}
+              alt="BarberSupply"
+              className="w-20 object-cover h-20 mb-4"
+            />
+
             <p className="text-gray-400 text-sm">
               Premium barber supplies for professionals and enthusiasts.
             </p>
@@ -71,7 +73,7 @@ export default function Footer() {
         </div>
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-sm text-gray-400">
-            © 2024 BarberSupply. All rights reserved.
+            © 2025 BarberSupply. All rights reserved.
           </p>
           <div className="flex gap-4">
             <Link href="#" className="text-sm text-gray-400 hover:text-white">

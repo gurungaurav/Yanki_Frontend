@@ -89,7 +89,7 @@ const OrderCard = ({ order }) => {
               `/product/order-details?purchase_order_id=${order.orderId}`
             )
           }
-          buttonName={"View Details"}
+          buttonName={"View "}
         ></Button>
       </div>
     </div>

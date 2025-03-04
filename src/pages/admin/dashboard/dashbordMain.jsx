@@ -3,12 +3,14 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getOrdersAdmin } from "../../../api/order.api";
 import { getDashboardData } from "../../../api/dashboard.api";
+import { Badge } from "../../../components/badge";
 
 export default function DashbordPage() {
   const [totalUsers, setTotalUsers] = useState(0);
   const [totalOrders, setTotalOrders] = useState(0);
   const [totalProducts, setTotalProducts] = useState(0);
   const [filteredOrders, setFilteredOrders] = useState([]);
+  const [totalRevenue, setTotalRevenue] = useState(0);
 
   const filterOrders = async () => {
     try {
@@ -35,6 +37,7 @@ export default function DashbordPage() {
       setTotalUsers(details.data.totalUsers);
       setTotalOrders(details.data.totalOrders);
       setTotalProducts(details.data.totalProducts);
+      setTotalRevenue(details.data.totalAmount);
     } catch (error) {
       console.error("Failed to fetch dashboard data:", error);
     }
@@ -56,6 +59,10 @@ export default function DashbordPage() {
           <h2 className="text-lg font-semibold mb-2">Total Products</h2>
           <p className="text-2xl font-bold">{totalProducts}</p>
         </div>
+        <div className="bg-white shadow rounded-lg p-4">
+          <h2 className="text-lg font-semibold mb-2">Total Revenue</h2>
+          <p className="text-2xl font-bold">NPR {totalRevenue}</p>
+        </div>
       </div>
 
       <table className="min-w-full border-collapse border border-gray-300 mt-10">
@@ -69,6 +76,9 @@ export default function DashbordPage() {
             </th>
             <th className="border border-gray-300 px-4 py-2 text-left font-semibold">
               Date
+            </th>
+            <th className="border border-gray-300 px-4 py-2 text-left font-semibold">
+              Payment Method
             </th>
             <th className="border border-gray-300 px-4 py-2 text-left font-semibold">
               Status
@@ -91,7 +101,12 @@ export default function DashbordPage() {
                 {new Date(order.orderDate).toLocaleDateString()}
               </td>
               <td className="border border-gray-300 px-4 py-2">
-                {order.orderStatus}
+                {order?.orderStatus == "cancelled"
+                  ? "Refunded"
+                  : order.paymentMethod}
+              </td>
+              <td className="border border-gray-300 px-4 py-2">
+                <Badge status={order.orderStatus} />
               </td>
               <td className="border border-gray-300 px-4 py-2">
                 NPR {order.totalAmount}
