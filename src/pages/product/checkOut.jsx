@@ -52,7 +52,6 @@ export default function CheckOutPage() {
     } catch (error) {
       toast.error(error.response?.data?.message);
       navigate("/login");
-      console.error("Failed to fetch user details:", error);
     }
   };
 
@@ -77,8 +76,6 @@ export default function CheckOutPage() {
       const data = await placeOrder(initialValues, loggedUser.token);
       clearCart();
       if (paymentMethod === "cod") {
-        console.log("sdsdsd");
-
         toast.success(data.message);
         navigate(
           `/product/order-details?purchase_order_id=${data.data.orderId}`

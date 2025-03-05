@@ -46,28 +46,38 @@ export default function UserListsPage() {
             </tr>
           </thead>
           <tbody>
-            {users?.map((user) => (
-              <tr key={user._id} className="even:bg-gray-50">
-                <td className="border border-gray-300 px-4 py-2">
-                  {user.firstName}
-                </td>
-                <td className="border border-gray-300 px-4 py-2">
-                  {user.lastName}
-                </td>
-                <td className="border border-gray-300 px-4 py-2">
-                  {user.email}
-                </td>
-                <td className="border border-gray-300 px-4 py-2">
-                  {user.username}
-                </td>
-                <td className="border border-gray-300 px-4 py-2">
-                  {user.phoneNumber}
-                </td>
-                <td className="border border-gray-300 px-4 py-2">
-                  {user.address}
+            {users?.length === 0 ? (
+              <tr>
+                <td colSpan="6" className="text-center py-4">
+                  <p className="font-bold text-2xl text-black ">
+                    No users found
+                  </p>
                 </td>
               </tr>
-            ))}
+            ) : (
+              users?.map((user) => (
+                <tr key={user._id} className="even:bg-gray-50">
+                  <td className="border border-gray-300 px-4 py-2">
+                    {user.firstName}
+                  </td>
+                  <td className="border border-gray-300 px-4 py-2">
+                    {user.lastName}
+                  </td>
+                  <td className="border border-gray-300 px-4 py-2">
+                    {user.email}
+                  </td>
+                  <td className="border border-gray-300 px-4 py-2">
+                    {user.username}
+                  </td>
+                  <td className="border border-gray-300 px-4 py-2">
+                    {user.phoneNumber}
+                  </td>
+                  <td className="border border-gray-300 px-4 py-2">
+                    {user.address}
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>

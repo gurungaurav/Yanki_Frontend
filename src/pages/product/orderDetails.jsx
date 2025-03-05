@@ -8,7 +8,7 @@ import {
 } from "../../api/order.api";
 import useUserStore from "../../store/useUserStore";
 import { toast } from "react-toastify";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Badge } from "../../components/badge";
 import Button from "../../components/button";
 
@@ -18,33 +18,31 @@ export default function OrderDetailsPage() {
   const pidx = searchParams.get("pidx");
   const purchase_order_id = searchParams.get("purchase_order_id");
   const [orderDetails, setOrderDetails] = useState(null); // Initially null to handle order not found state
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null); // To handle errors
   const [showRefundModal, setShowRefundModal] = useState(false);
+  const navigate = useNavigate();
+
+  //So if the pidx which is the payment id set by the khalti is available then it will verify the payment
+  //if not then it will only fetch the order details provoking the user to verify the payment
 
   useEffect(() => {
     verifyPayment();
   }, [pidx, purchase_order_id, loggedUser?.token]);
 
   useEffect(() => {
-    if (purchase_order_id) {
-      fetchOrderDetails();
-    } else {
-      setError("Invalid order ID.");
-      setLoading(false);
-    }
-  }, [purchase_order_id]);
+    fetchOrderDetails();
+  }, [purchase_order_id, loggedUser]);
 
   const fetchOrderDetails = async () => {
+    if (!loggedUser) {
+      toast.error("You need to login to view your order details");
+      navigate("/login");
+      return;
+    }
     try {
       const response = await getSpecificOrder(purchase_order_id);
       setOrderDetails(response.data);
     } catch (error) {
-      setError(
-        error.response?.data?.message || "Failed to fetch order details."
-      );
-    } finally {
-      setLoading(false);
+      console.log("Failed to fetch order details:", error);
     }
   };
 
@@ -102,25 +100,11 @@ export default function OrderDetailsPage() {
   const totalAmount =
     orderDetails?.totalAmount || calculateTotalAmount(orderDetails?.items);
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <main className="container mx-auto px-4 py-12 w-full">
-          <div className="text-center text-red-600 font-semibold">{error}</div>
-        </main>
-      </div>
-    );
-  }
-
   if (!orderDetails) {
     return (
       <div className="min-h-screen bg-gray-50">
         <main className="container mx-auto px-4 py-12 w-full">
-          <div className="text-center text-red-600 font-semibold">
+          <div className="text-center text-2xl font-semibold">
             Order not found
           </div>
         </main>
@@ -160,16 +144,13 @@ export default function OrderDetailsPage() {
                 </div>
                 <div className="flex-1">
                   <h3 className="font-medium text-sm text-gray-500 mb-2">
-                    PAYMENT METHOD
+                    PAYMENT
                   </h3>
                   <div className="flex items-center gap-2">
-                    {orderDetails.paymentMethod === "Khalti" ? (
-                      <CreditCard className="h-4 w-4" />
-                    ) : (
-                      <Check className="h-4 w-4" />
-                    )}
                     <span className="text-sm font-medium">
-                      {orderDetails.paymentMethod}
+                      {orderDetails.orderStatus === "cancelled"
+                        ? "Refunded"
+                        : orderDetails.paymentMethod}
                     </span>
                   </div>
                 </div>
@@ -270,7 +251,6 @@ export default function OrderDetailsPage() {
               <Button
                 buttonName={"Confirm"}
                 handleOnClick={handleCancelOrder}
-                // handleOnClick={onConfirm}
               />
 
               <Button

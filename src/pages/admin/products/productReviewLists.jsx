@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import {
   getProductReviews,
   softDeleteProductReviews,
-} from "../../../api/reviews";
+} from "../../../api/reviews.api";
 
 const ProductReviewListsPage = () => {
   const { productId } = useParams();
@@ -25,8 +25,7 @@ const ProductReviewListsPage = () => {
 
   const softDelete = async (reviewId) => {
     try {
-      const data = await softDeleteProductReviews(reviewId);
-      console.log(data);
+      await softDeleteProductReviews(reviewId);
       filterReviews(); // Refetch the data after toggling the deleted status
     } catch (error) {
       console.error("Failed to delete review:", error);
@@ -44,7 +43,7 @@ const ProductReviewListsPage = () => {
                 Username
               </th>
               <th className="border border-gray-300 px-4 py-2 text-left font-semibold">
-                Rating
+                Ratings
               </th>
               <th className="border border-gray-300 px-4 py-2 text-left font-semibold">
                 Review
@@ -59,35 +58,45 @@ const ProductReviewListsPage = () => {
             </tr>
           </thead>
           <tbody>
-            {reviews?.map((review) => (
-              <tr key={review._id} className="even:bg-gray-50">
-                <td className="border border-gray-300 px-4 py-2">
-                  {review.userId.username}
-                </td>
-                <td className="border border-gray-300 px-4 py-1">
-                  {review.rating}
-                </td>
-                <td className="border border-gray-300 px-4 py-1 line-clamp-3 h-[82px] ">
-                  {review.review}
-                </td>
-                <td className="border border-gray-300 px-4 py-1">
-                  {new Date(review.reviewDate).toLocaleDateString()}
-                </td>
-
-                <td className="border border-gray-300 px-4 py-1">
-                  <button
-                    onClick={() => softDelete(review._id)}
-                    className={`p-2 cursor-pointer opacity-90 rounded-md duration-300 ${
-                      review.isDeleted
-                        ? "bg-green-500 text-white"
-                        : "bg-red-500 text-white"
-                    }`}
-                  >
-                    {review.isDeleted ? "Restore" : "Delete"}
-                  </button>
+            {reviews?.length === 0 ? (
+              <tr>
+                <td colSpan="5" className="text-center py-4">
+                  <p className="font-bold text-2xl text-black ">
+                    No reviews found
+                  </p>
                 </td>
               </tr>
-            ))}
+            ) : (
+              reviews?.map((review) => (
+                <tr key={review._id} className="even:bg-gray-50">
+                  <td className="border border-gray-300 px-4 py-2">
+                    {review.userId.username}
+                  </td>
+                  <td className="border border-gray-300 px-4 py-1">
+                    {review.rating}
+                  </td>
+                  <td className="border border-gray-300 px-4 py-1 line-clamp-3 h-[82px] ">
+                    {review.review}
+                  </td>
+                  <td className="border border-gray-300 px-4 py-1">
+                    {new Date(review.reviewDate).toLocaleDateString()}
+                  </td>
+
+                  <td className="border border-gray-300 px-4 py-1">
+                    <button
+                      onClick={() => softDelete(review._id)}
+                      className={`p-2 cursor-pointer opacity-90 rounded-md duration-300 ${
+                        review.isDeleted
+                          ? "bg-green-500 text-white"
+                          : "bg-red-500 text-white"
+                      }`}
+                    >
+                      {review.isDeleted ? "Restore" : "Delete"}
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>

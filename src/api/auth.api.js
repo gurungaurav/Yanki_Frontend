@@ -1,8 +1,6 @@
 import { axiosInstance } from "./index.api";
 
 export const RegisterUser = async (form) => {
-  console.log(form, "afsdfdsf");
-
   return (await axiosInstance.post("/auth/register", form)).data;
 };
 

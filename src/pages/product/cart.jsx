@@ -48,10 +48,9 @@ export default function CartPage() {
     if (user) {
       naviagte("/product/check-out");
     } else {
-      toast.error("Please login to continue");
+      toast.error("Please login to place order");
       naviagte("/login");
     }
-    console.log("Checkout");
   };
 
   if (!cartItems.length) {
@@ -71,7 +70,7 @@ export default function CartPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 ">
         <div className="md:col-span-2">
           <div className="space-y-4">
-            {cartItems.map((item) => (
+            {cartItems?.map((item) => (
               <div
                 key={item.id}
                 className="flex items-center justify-between gap-2  border-b border-b-gray-300 pb-4"

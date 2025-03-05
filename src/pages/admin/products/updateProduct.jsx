@@ -6,7 +6,7 @@ import { getCategories } from "../../../api/category.api";
 import TextInput from "../../../components/textInput";
 import { updateProduct, getSpecificProduct } from "../../../api/product.api";
 import { toast } from "react-toastify";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 const UpdateProductPage = () => {
   const [availableCategories, setAvailableCategories] = useState([]);
@@ -16,6 +16,7 @@ const UpdateProductPage = () => {
   const [newImages, setNewImages] = useState([]); // For newly uploaded images
   const [imagePreviews, setImagePreviews] = useState([]); // To store image previews
   const [initialValues, setInitialValues] = useState({});
+  const navigate = useNavigate();
 
   const formik = useFormik({
     enableReinitialize: true,
@@ -29,11 +30,11 @@ const UpdateProductPage = () => {
     },
     validationSchema: Yup.object({
       name: Yup.string().required("Product name is required"),
-      price: Yup.number().required("Price is required"),
+      price: Yup.number().min(10).required("Price is required"),
       description: Yup.string().required("Description is required"),
-      stockQuantity: Yup.number().required("Quantity is required"),
+      stockQuantity: Yup.number().min(1).required("Quantity is required"),
       categoryId: Yup.string().required("Category is required"),
-      images: Yup.array().min(2, "At least two image is required"),
+      images: Yup.array().min(4, "At least two image is required"),
     }),
     onSubmit: async (values) => {
       handleSubmit(values);
@@ -73,8 +74,6 @@ const UpdateProductPage = () => {
     }
   };
 
-  console.log(formik.errors, "sdsdsd");
-
   const fetchCategories = async () => {
     try {
       const data = await getCategories({ isDeleted: false });
@@ -101,8 +100,6 @@ const UpdateProductPage = () => {
     }
   };
 
-  // console.log(imagePreviews, "kaka");
-
   const handleRemoveImage = (index) => {
     const updatedPreviews = [...imagePreviews];
     const removedImage = updatedPreviews.splice(index, 1)[0];
@@ -126,8 +123,6 @@ const UpdateProductPage = () => {
 
   const handleSubmit = async (values) => {
     try {
-      console.log("sdsdsd", values);
-
       const updatedValues = {};
       Object.keys(values).forEach((key) => {
         if (values[key] !== initialValues[key]) {
@@ -149,23 +144,12 @@ const UpdateProductPage = () => {
       formData.append("imagesToDelete", JSON.stringify(removedImageIds));
       const response = await updateProduct(productId, formData);
       toast.success(response.message);
+      navigate("/dashboard/products");
     } catch (error) {
       console.error("Failed to update product:", error);
       toast.error(error.response?.data?.message || "Failed to update product");
     }
   };
-
-  console.log(removedImageIds, "kaka");
-
-  const isFormChanged = () => {
-    return (
-      JSON.stringify(formik.values) !== JSON.stringify(initialValues) ||
-      newImages.length > 0 ||
-      removedImageIds.length > 0
-    );
-  };
-
-  console.log(imagePreviews, "snsjd");
 
   return (
     <div className="p-6 mx-auto mt-10 max-w-2xl container shadow-md border border-gray-200 rounded-md">
@@ -282,11 +266,7 @@ const UpdateProductPage = () => {
             </div>
           ))}
         </div>
-        <Button
-          buttonName={"Update Product"}
-          type={"submit"}
-          disabled={!isFormChanged()}
-        />
+        <Button buttonName={"Update Product"} type={"submit"} />
       </form>
     </div>
   );

@@ -24,11 +24,11 @@ const AddProductPage = () => {
     },
     validationSchema: Yup.object({
       productName: Yup.string().required("Product name is required"),
-      price: Yup.number().required("Price is required"),
+      price: Yup.number().min(10).required("Price is required"),
       description: Yup.string().required("Description is required"),
-      quantity: Yup.number().required("Quantity is required"),
+      quantity: Yup.number().min(1).required("Quantity is required"),
       categoryId: Yup.string().required("Category is required"),
-      images: Yup.array().required("Images are required"),
+      images: Yup.array().min(4).required("Images are required"),
     }),
     onSubmit: (values) => {
       handleSubmit(values);
@@ -65,8 +65,6 @@ const AddProductPage = () => {
       images.filter((_, i) => i !== index)
     );
   };
-  console.log(images, "asa");
-  console.log(formik.values, "asa");
 
   const handleSubmit = async () => {
     try {
@@ -83,17 +81,13 @@ const AddProductPage = () => {
       formData.append("categoryId", formik.values.categoryId);
 
       const data = await addProduct(formData);
-      console.log(data);
-      toast.success("Product added successfully");
+      toast.success(data.message);
       navigate("/dashboard/products");
     } catch (error) {
       console.error("Failed to add product:", error);
       toast.error(error.response.data.message);
     }
-
-    // Add logic to send data to the backend
   };
-  console.log(formik.errors);
 
   return (
     <div className="p-6 mx-auto mt-10 max-w-2xl container shadow-md border border-gray-200 rounded-md">

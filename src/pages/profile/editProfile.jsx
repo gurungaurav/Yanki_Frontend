@@ -25,7 +25,9 @@ export default function EditProfilePage() {
     lastName: Yup.string().required("Last name is required"),
     username: Yup.string().required("Username is required"),
     address: Yup.string().required("Address is required"),
-    phoneNumber: Yup.number().required("Phone number is required"),
+    phoneNumber: Yup.string()
+      .length(10, "Phone number must be exactly 10 digits")
+      .required("Phone number is required"),
   });
 
   const formik = useFormik({
@@ -55,11 +57,10 @@ export default function EditProfilePage() {
         if (values.phoneNumber !== initialValues.phoneNumber) {
           updatedValues.phoneNumber = values.phoneNumber;
         }
-        console.log(updatedValues, "sdsd");
 
         const res = await updateUserProfile(token, updatedValues);
         toast.success(res.message);
-        console.log(res);
+        navigate("/profile");
       } catch (error) {
         console.error(error);
         toast.error(error.response.data.message);
@@ -92,25 +93,12 @@ export default function EditProfilePage() {
       });
     } catch (error) {
       toast.error(error.response?.data?.message);
-      //   navigate("/login");
-      console.error("Failed to fetch user details:", error);
     }
   };
 
   useEffect(() => {
     fetchUserDetails();
   }, [token]);
-
-  const isFormChanged = () => {
-    return (
-      formik.values.firstName !== initialValues.firstName ||
-      formik.values.lastName !== initialValues.lastName ||
-      formik.values.username !== initialValues.username ||
-      formik.values.address !== initialValues.address ||
-      formik.values.phoneNumber !== initialValues.phoneNumber
-    );
-  };
-  console.log(isFormChanged(), "dsd");
 
   return (
     <div className="flex items-center justify-center pt-10 pb-10">
@@ -122,7 +110,7 @@ export default function EditProfilePage() {
         <div className="flex justify-end">
           <Link
             to={`/profile`}
-            className="rounded-full p-2 hover:bg-neutral-100 text-2xl"
+            className="rounded-full p-2 hover:bg-neutral-100 text-2xl duration-300"
           >
             <RxCross1 />
           </Link>
@@ -155,12 +143,8 @@ export default function EditProfilePage() {
           formik={formik}
         />
 
-        <div className="flex justify-end text-sm font-semibold gap-4 mt-10">
-          <Button
-            type="submit"
-            buttonName={"Update"}
-            isDisabled={!isFormChanged()}
-          />
+        <div className="flex justify-end text-sm font-semibold gap-4 mt-8">
+          <Button type="submit" buttonName={"Update"} />
         </div>
       </form>
     </div>

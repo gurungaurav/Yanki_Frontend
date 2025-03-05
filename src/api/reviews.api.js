@@ -20,6 +20,14 @@ export const addProductReviews = async (review, jwt) => {
   ).data;
 };
 
+export const updateProductReviews = async (reviewId, review, jwt) => {
+  return (
+    await axiosInstance.put(`/review/updateReview/${reviewId}`, review, {
+      headers: { Authorization: `Bearer ${jwt}` },
+    })
+  ).data;
+};
+
 export const softDeleteProductReviews = async (reviewId) => {
   return (await axiosInstance.delete(`/review/deleteReview/${reviewId}`)).data;
 };

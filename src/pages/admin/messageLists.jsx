@@ -37,19 +37,29 @@ export default function MessageListsPage() {
             </tr>
           </thead>
           <tbody>
-            {filteredMessages?.map((message) => (
-              <tr key={message._id} className="even:bg-gray-50">
-                <td className="border border-gray-300 px-4 py-2">
-                  {message.name}
-                </td>
-                <td className="border border-gray-300 px-4 py-2">
-                  {message.message}
-                </td>
-                <td className="border border-gray-300 px-4 py-2">
-                  {new Date(message.timestamp).toLocaleDateString()}
+            {filteredMessages?.length === 0 ? (
+              <tr>
+                <td colSpan="3" className="text-center py-4">
+                  <p className="font-bold text-2xl text-black ">
+                    No messages found
+                  </p>
                 </td>
               </tr>
-            ))}
+            ) : (
+              filteredMessages?.map((message) => (
+                <tr key={message._id} className="even:bg-gray-50">
+                  <td className="border border-gray-300 px-4 py-2">
+                    {message.name}
+                  </td>
+                  <td className="border border-gray-300 px-4 py-2">
+                    {message.message}
+                  </td>
+                  <td className="border border-gray-300 px-4 py-2">
+                    {new Date(message.timestamp).toLocaleDateString()}
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
