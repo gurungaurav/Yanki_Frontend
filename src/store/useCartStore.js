@@ -4,8 +4,6 @@ import { create } from "zustand";
 const useCartStore = create((set) => ({
   cart: JSON.parse(localStorage.getItem("cart")) || [], // Load cart from localStorage
   addToCart: (item) => {
-    console.log(item, "asas");
-
     set((state) => {
       const existingItem = state.cart.find(
         (cartItem) => cartItem.id === item.id

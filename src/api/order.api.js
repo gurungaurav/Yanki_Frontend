@@ -25,8 +25,6 @@ export const cancelOrder = async (id, jwt) => {
 };
 
 export const getSpecificUserOrders = async (jwt) => {
-  console.log(jwt, "jwt");
-
   return (
     await axiosInstance.get("/order/getSpecificUserOrders", {
       headers: { Authorization: `Bearer ${jwt}` },

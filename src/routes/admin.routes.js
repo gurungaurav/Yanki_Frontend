@@ -5,9 +5,7 @@ const AddProductPage = lazy(() =>
 const ProductListsPage = lazy(() =>
   import("../pages/admin/products/productLists")
 );
-const DashbordPage = lazy(() =>
-  import("../pages/admin/dashboard/dashbordMain")
-);
+const DashbordPage = lazy(() => import("../pages/admin/dashbordMain"));
 const ProductReviewListsPage = lazy(() =>
   import("../pages/admin/products/productReviewLists")
 );

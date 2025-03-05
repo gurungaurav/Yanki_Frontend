@@ -16,8 +16,6 @@ export const deleteCategory = async (categoryId) => {
 };
 
 export const updateCategory = async (categoryId, categoryName) => {
-  console.log(categoryName, "asas", categoryId);
-
   return (
     await axiosInstance.put(`/category/updateCategory/${categoryId}`, {
       name: categoryName,

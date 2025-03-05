@@ -1,7 +1,5 @@
-import { useNavigate } from "react-router-dom";
 import Button from "../../../components/button";
 import { useEffect, useState } from "react";
-import { softDeleteProduct } from "../../../api/product.api";
 import {
   getCategories,
   addCategory,
@@ -12,6 +10,7 @@ import TextInput from "../../../components/textInput";
 import * as Yup from "yup";
 import { useFormik } from "formik";
 import { toast } from "react-toastify";
+import { Modal } from "../../../components/modal";
 
 const CategoryListsPage = () => {
   const [availableCategories, setAvailableCategories] = useState([]);
@@ -55,8 +54,7 @@ const CategoryListsPage = () => {
 
   const deleteCategoryById = async (categoryId) => {
     try {
-      const data = await deleteCategory(categoryId); // soft delete
-      console.log(data);
+      await deleteCategory(categoryId); // soft delete
       fetchCategories(); // Refetch the data after deleting
     } catch (error) {
       toast.error(error.response.data.message);
@@ -94,15 +92,13 @@ const CategoryListsPage = () => {
         categoryToUpdate.categoryId,
         formik.values.name
       );
-      console.log(data);
+      toast.success(data.message);
       fetchCategories(); // Refetch the data after updating
       closeUpdateCategoryModal();
     } catch (error) {
       console.error("Failed to update category:", error);
     }
   };
-
-  console.log(formik.values.name);
 
   return (
     <div className="p-4">
@@ -131,32 +127,40 @@ const CategoryListsPage = () => {
             </tr>
           </thead>
           <tbody>
-            {availableCategories?.map((category) => (
-              <tr key={category.id} className="even:bg-gray-50">
-                <td className="border border-gray-300 px-4 py-1">
-                  {category.name}
-                </td>
-                <td className="border border-gray-300 px-4 py-1">
-                  {category.isDeleted ? "Deleted" : "Active"}
-                </td>
-                <td className="border border-gray-300 px-4 py-1 flex gap-2">
-                  <Button
-                    buttonName={"Update"}
-                    handleOnClick={() => openUpdateCategoryModal(category)}
-                  />
-                  <button
-                    onClick={() => deleteCategoryById(category._id)}
-                    className={`p-2  cursor-pointer opacity-90 rounded-md duration-300 ${
-                      category.isDeleted
-                        ? "bg-green-500 text-white"
-                        : "bg-red-500 text-white"
-                    }`}
-                  >
-                    {category.isDeleted ? "Restore" : "Delete"}
-                  </button>
+            {availableCategories.length === 0 ? (
+              <tr>
+                <td colSpan="3" className="text-center">
+                  No categories found
                 </td>
               </tr>
-            ))}
+            ) : (
+              availableCategories?.map((category) => (
+                <tr key={category.id} className="even:bg-gray-50">
+                  <td className="border border-gray-300 px-4 py-1">
+                    {category.name}
+                  </td>
+                  <td className="border border-gray-300 px-4 py-1">
+                    {category.isDeleted ? "Deleted" : "Active"}
+                  </td>
+                  <td className="border border-gray-300 px-4 py-1 flex gap-2">
+                    <Button
+                      buttonName={"Update"}
+                      handleOnClick={() => openUpdateCategoryModal(category)}
+                    />
+                    <button
+                      onClick={() => deleteCategoryById(category._id)}
+                      className={`p-2  cursor-pointer opacity-90 rounded-md duration-300 ${
+                        category.isDeleted
+                          ? "bg-green-500 text-white"
+                          : "bg-red-500 text-white"
+                      }`}
+                    >
+                      {category.isDeleted ? "Restore" : "Delete"}
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
@@ -168,7 +172,6 @@ const CategoryListsPage = () => {
         onConfirm={() => {
           // Logic to update category
           updateCategories();
-          console.log("Updating category:", categoryToUpdate);
         }}
         message={`Are you sure you want to update category name: ${categoryToUpdate?.categoryName}?`}
         disableConfirm={formik.values.name === categoryToUpdate?.categoryName}
@@ -197,43 +200,6 @@ const CategoryListsPage = () => {
           formik={formik}
         />
       </Modal>
-    </div>
-  );
-};
-
-const Modal = ({
-  show,
-  onClose,
-  onConfirm,
-  message,
-  children,
-  disableConfirm,
-}) => {
-  if (!show) return null;
-
-  return (
-    <div className="fixed inset-0 bg-opacity-50 flex justify-center items-center z-50">
-      <div className="bg-white p-6 rounded-md shadow-lg w-1/3">
-        <h3 className="text-lg font-semibold">{message}</h3>
-        {children}
-        <div className="mt-4 flex justify-end">
-          <button
-            className={`bg-red-500 text-white py-2 px-4 rounded mr-2 cursor-pointer ${
-              disableConfirm ? "opacity-50 cursor-not-allowed" : ""
-            }`}
-            onClick={onConfirm}
-            disabled={disableConfirm}
-          >
-            Confirm
-          </button>
-          <button
-            className="bg-gray-500 text-white py-2 px-4 rounded cursor-pointer"
-            onClick={onClose}
-          >
-            Cancel
-          </button>
-        </div>
-      </div>
     </div>
   );
 };

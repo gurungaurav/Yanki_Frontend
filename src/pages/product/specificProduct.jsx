@@ -1,13 +1,19 @@
 import { ShoppingCart } from "lucide-react";
-import { FaStar } from "react-icons/fa";
+import { FaEdit, FaStar, FaTrash } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { getAllProducts, getSpecificProduct } from "../../api/product.api";
-import { addProductReviews, getProductReviews } from "../../api/reviews";
+import {
+  addProductReviews,
+  getProductReviews,
+  softDeleteProductReviews,
+  updateProductReviews,
+} from "../../api/reviews.api";
 import useCartStore from "../../store/useCartStore";
 import { toast } from "react-toastify";
 import ProductCard from "../../components/productCard";
 import useUserStore from "../../store/useUserStore";
+import { Modal } from "../../components/modal";
 
 export default function ProductPage() {
   const params = useParams();
@@ -76,9 +82,20 @@ export default function ProductPage() {
 }
 
 function ReviewSection({ productId }) {
-  const [reviews, setReview] = useState(null);
+  const [reviews, setReview] = useState([]);
+
   const [reviewText, setReviewText] = useState("");
   const [rating, setRating] = useState(0);
+
+  const [editReviewId, setEditReviewId] = useState(null);
+  const [editingReview, setEditingReview] = useState({});
+
+  const [newReview, setNewReview] = useState("");
+  const [newRating, setNewRating] = useState(0);
+
+  const [showModal, setShowModal] = useState(false);
+  const [showDeleteCategoryModal, setShowDeleteCategoryModal] = useState(false);
+
   const userStore = useUserStore((state) => state?.user);
   const token = userStore?.token;
 
@@ -110,10 +127,53 @@ function ReviewSection({ productId }) {
         },
         token
       );
-      toast.success(response.data.message);
+      toast.success(response.message);
       setReviewText("");
       setRating(0);
       getReview(); // Refresh reviews after adding a new one
+    } catch (error) {
+      toast.error(error.response.data.message);
+    }
+  };
+
+  const handleEditReview = (review) => {
+    setEditReviewId(review._id);
+    setEditingReview(review);
+    setNewReview(review.review);
+    setNewRating(review.rating);
+    setShowModal(true);
+  };
+
+  const handleDeleteReview = (reviewId) => {
+    setEditReviewId(reviewId);
+    setShowDeleteCategoryModal(true);
+  };
+
+  const updateReview = async () => {
+    try {
+      const response = await updateProductReviews(
+        editReviewId,
+        {
+          review: newReview,
+          rating: newRating,
+        },
+        token
+      );
+      toast.success(response.message);
+      setShowModal(false);
+      setReviewText("");
+      setRating(0);
+      getReview(); // Refresh reviews after updating
+    } catch (error) {
+      toast.error(error.response.data.message);
+    }
+  };
+
+  const deleteReview = async (reviewId) => {
+    try {
+      const response = await softDeleteProductReviews(reviewId);
+      toast.success(response.message);
+      getReview(); // Refresh reviews after deleting
     } catch (error) {
       toast.error(error.response.data.message);
     }
@@ -150,6 +210,18 @@ function ReviewSection({ productId }) {
                 <span className="text-sm text-gray-500">
                   {new Date(review?.reviewDate).toLocaleDateString()}
                 </span>
+                {review?.userId?._id === userStore?.id && (
+                  <div className="flex gap-2 ml-4">
+                    <FaEdit
+                      className="cursor-pointer text-blue-500"
+                      onClick={() => handleEditReview(review)}
+                    />
+                    <FaTrash
+                      className="cursor-pointer text-red-500"
+                      onClick={() => handleDeleteReview(review._id)}
+                    />
+                  </div>
+                )}
               </div>
               <p className="text-gray-700">{review?.review}</p>
             </div>
@@ -196,6 +268,64 @@ function ReviewSection({ productId }) {
           Submit Review
         </button>
       </form>
+
+      {/* Update Review Modal */}
+      <Modal
+        show={showModal}
+        onClose={() => {
+          setShowModal(false);
+          setEditReviewId(null);
+        }}
+        onConfirm={updateReview}
+        message={`Are you sure you want to update the review?`}
+        disableConfirm={
+          newReview === editingReview?.review &&
+          newRating === editingReview?.rating
+        }
+      >
+        <form className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Rating
+            </label>
+            <div className="flex items-center mt-1">
+              {[...Array(5)].map((_, i) => (
+                <FaStar
+                  key={i}
+                  size={24}
+                  className={`cursor-pointer ${
+                    i < newRating ? "text-yellow-400" : "text-gray-300"
+                  }`}
+                  onClick={() => setNewRating(i + 1)}
+                />
+              ))}
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Review
+            </label>
+            <textarea
+              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-opacity-50"
+              rows="4"
+              value={newReview}
+              onChange={(e) => setNewReview(e.target.value)}
+              required
+            ></textarea>
+          </div>
+        </form>
+      </Modal>
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        show={showDeleteCategoryModal}
+        onClose={() => {
+          setShowDeleteCategoryModal(false);
+          setEditReviewId(null);
+        }}
+        onConfirm={() => deleteReview(editReviewId)} // Ensure this works correctly
+        message={"Are you sure you want to delete this review?"}
+      ></Modal>
     </section>
   );
 }

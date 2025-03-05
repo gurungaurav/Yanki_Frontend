@@ -6,7 +6,6 @@ import { getCategories } from "../../../api/category.api";
 
 const ProductListsPage = () => {
   const navigate = useNavigate();
-
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("All");
@@ -35,7 +34,6 @@ const ProductListsPage = () => {
       if (deletedStatus === "deleted") filters.isDeleted = true;
       if (deletedStatus === "notDeleted") filters.isDeleted = false;
     }
-    console.log(filters);
 
     try {
       const data = await getAllProducts(filters);
@@ -51,15 +49,14 @@ const ProductListsPage = () => {
 
   const softDelete = async (productId, isDeleted) => {
     try {
-      console.log(productId, isDeleted, "lalalal");
-
-      const data = await softDeleteProduct(productId, isDeleted);
-      console.log(data);
+      await softDeleteProduct(productId, isDeleted);
       filterProduct(); // Refetch the data after toggling the deleted status
     } catch (error) {
       console.error("Failed to delete product:", error);
     }
   };
+
+  console.log(filteredProducts, "sdsd");
 
   return (
     <div className="p-4">
@@ -119,10 +116,10 @@ const ProductListsPage = () => {
                 Image
               </th>
               <th className="border border-gray-300 px-4 py-2 text-left font-semibold">
-                Category
+                Name
               </th>
               <th className="border border-gray-300 px-4 py-2 text-left font-semibold">
-                Name
+                Category
               </th>
               <th className="border border-gray-300 px-4 py-2 text-left font-semibold">
                 Description
@@ -145,68 +142,78 @@ const ProductListsPage = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredProducts?.map((product) => (
-              <tr key={product.id} className="even:bg-gray-50">
-                <td className="border border-gray-300 px-4 py-2">
-                  <img
-                    src={product.image}
-                    alt={product.name}
-                    className="h-16 w-2xs object-cover rounded-lg"
-                  />
-                </td>
-                <td className="border border-gray-300 px-4 py-1">
-                  {product.categoryId.name}
-                </td>
-                <td className="border border-gray-300 px-4 py-1">
-                  {product.name}
-                </td>
-                <td className="border border-gray-300 px-4 py-1 line-clamp-3 h-[82px] ">
-                  {product.description}
-                </td>
-                <td className="border border-gray-300 px-4 py-1">
-                  ${product.price.toFixed(2)}
-                </td>
-                <td className="border border-gray-300 px-4 py-1">
-                  {product.stockQuantity}
-                </td>
-                <td className="border border-gray-300 px-4 py-1">
-                  {product.reviewsCount}
-                </td>
-                <td className="border border-gray-300 px-4 py-1">
-                  <Button
-                    buttonName={"Reviews"}
-                    handleOnClick={() =>
-                      navigate(`/dashboard/products/${product._id}/reviews`)
-                    }
-                  ></Button>
-                </td>
-                <td className="border border-gray-300 px-4 py-1 ">
-                  <div className=" flex items-center gap-2 justify-center">
-                    <Button
-                      buttonName={"Update"}
-                      handleOnClick={() =>
-                        navigate(
-                          `/dashboard/products/${product._id}/update-product`
-                        )
-                      }
-                    ></Button>
-
-                    <button
-                      onClick={() =>
-                        softDelete(product._id, !product.isDeleted)
-                      }
-                      className={`p-2  cursor-pointer opacity-90 rounded-md duration-300 ${
-                        product.isDeleted
-                          ? "bg-green-500 text-white"
-                          : "bg-red-500 text-white"
-                      }`}
-                    >
-                      {product.isDeleted ? "Restore" : "Delete"}
-                    </button>
-                  </div>
+            {filteredProducts?.length === 0 ? (
+              <tr>
+                <td colSpan="9" className="text-center py-4">
+                  <p className="font-bold text-2xl text-black ">
+                    No products found
+                  </p>
                 </td>
               </tr>
-            ))}
+            ) : (
+              filteredProducts?.map((product) => (
+                <tr key={product?.id} className="even:bg-gray-50">
+                  <td className="border border-gray-300 px-4 py-2">
+                    <img
+                      src={product?.image}
+                      alt={product?.name}
+                      className="h-16 w-2xs object-cover rounded-lg"
+                    />
+                  </td>
+                  <td className="border border-gray-300 px-4 py-1">
+                    {product?.name}
+                  </td>
+                  <td className="border border-gray-300 px-4 py-1">
+                    {product?.categoryId.name}
+                  </td>
+                  <td className="border border-gray-300 px-4 py-1 line-clamp-3 h-[82px] ">
+                    {product?.description}
+                  </td>
+                  <td className="border border-gray-300 px-4 py-1">
+                    NPR {product?.price}
+                  </td>
+                  <td className="border border-gray-300 px-4 py-1">
+                    {product?.stockQuantity}
+                  </td>
+                  <td className="border border-gray-300 px-4 py-1">
+                    {product?.reviewsCount}
+                  </td>
+                  <td className="border border-gray-300 px-4 py-1">
+                    <Button
+                      buttonName={"Reviews"}
+                      handleOnClick={() =>
+                        navigate(`/dashboard/products/${product?._id}/reviews`)
+                      }
+                    ></Button>
+                  </td>
+                  <td className="border border-gray-300 px-4 py-1 ">
+                    <div className=" flex items-center gap-2 justify-center">
+                      <Button
+                        buttonName={"Update"}
+                        handleOnClick={() =>
+                          navigate(
+                            `/dashboard/products/${product?._id}/update-product`
+                          )
+                        }
+                      ></Button>
+
+                      <button
+                        onClick={() =>
+                          softDelete(product._id, !product.isDeleted)
+                        }
+                        className={`p-2  cursor-pointer opacity-90 rounded-md duration-300 ${
+                          product?.isDeleted
+                            ? "bg-green-500 text-white"
+                            : "bg-red-500 text-white"
+                        }`}
+                      >
+                        {product?.isDeleted ? "Restore" : "Delete"}
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>

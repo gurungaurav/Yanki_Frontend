@@ -19,8 +19,6 @@ export const updateProduct = async (productId, form) => {
   ).data;
 };
 export const softDeleteProduct = async (productId, isDeleted) => {
-  console.log(isDeleted, "asas");
-
   return (
     await axiosInstance.patch(`/product/deleteProduct/${productId}`, {
       isDeleted,

@@ -15,8 +15,6 @@ const OrderListsPage = () => {
     const filters = {};
 
     if (status !== "All") filters.status = status;
-    console.log(filters);
-
     try {
       const data = await getOrdersAdmin(filters);
       setFilteredOrders(data.data);
@@ -31,8 +29,7 @@ const OrderListsPage = () => {
 
   const updateOrder = async (orderId, newStatus) => {
     try {
-      const data = await updateOrderStatus(orderId, newStatus, token);
-      console.log(data);
+      await updateOrderStatus(orderId, newStatus, token);
       filterOrders(); // Refetch the data after updating the order status
     } catch (error) {
       console.error("Failed to update order status:", error);
@@ -74,7 +71,7 @@ const OrderListsPage = () => {
                 Date
               </th>
               <th className="border border-gray-300 px-4 py-2 text-left font-semibold">
-                Payment Method
+                Payment
               </th>
               <th className="border border-gray-300 px-4 py-2 text-left font-semibold">
                 Status
@@ -88,50 +85,60 @@ const OrderListsPage = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredOrders?.map((order) => (
-              <tr key={order._id} className="even:bg-gray-50">
-                <td className="border border-gray-300 px-4 py-2">
-                  {order.orderId}
-                </td>
-                <td className="border border-gray-300 px-4 py-2">
-                  {order.username}
-                </td>
-                <td className="border border-gray-300 px-4 py-2">
-                  {new Date(order.orderDate).toLocaleDateString()}
-                </td>
-                <td className="border border-gray-300 px-4 py-2">
-                  {order?.orderStatus == "cancelled"
-                    ? "Refunded"
-                    : order.paymentMethod}
-                </td>
-                <td className="border border-gray-300 px-4 py-2">
-                  <Badge status={order.orderStatus} />
-                </td>
-                <td className="border border-gray-300 px-4 py-2">
-                  NPR {order.totalAmount}
-                </td>
-                <td className="border border-gray-300 px-4 py-2 flex gap-2">
-                  <Button
-                    buttonName={"View"}
-                    handleOnClick={() =>
-                      navigate(
-                        `/dashboard/order-details?purchase_order_id=${order.orderId}`
-                      )
-                    }
-                  />
-                  <select
-                    value={order.orderStatus}
-                    onChange={(e) => updateOrder(order.orderId, e.target.value)}
-                    className="border px-2 py-1 rounded"
-                  >
-                    <option value="pending">Pending</option>
-                    <option value="shipped">Shipped</option>
-                    <option value="delivered">Delivered</option>
-                    <option value="cancelled">Cancelled</option>
-                  </select>
+            {filteredOrders.length === 0 ? (
+              <tr>
+                <td colSpan="7" className="text-center">
+                  No orders found
                 </td>
               </tr>
-            ))}
+            ) : (
+              filteredOrders?.map((order) => (
+                <tr key={order._id} className="even:bg-gray-50">
+                  <td className="border border-gray-300 px-4 py-2">
+                    {order.orderId}
+                  </td>
+                  <td className="border border-gray-300 px-4 py-2">
+                    {order.username}
+                  </td>
+                  <td className="border border-gray-300 px-4 py-2">
+                    {new Date(order.orderDate).toLocaleDateString()}
+                  </td>
+                  <td className="border border-gray-300 px-4 py-2">
+                    {order.orderStatus === "cancelled"
+                      ? "Refunded"
+                      : order.paymentMethod}
+                  </td>
+                  <td className="border border-gray-300 px-4 py-2">
+                    <Badge status={order.orderStatus} />
+                  </td>
+                  <td className="border border-gray-300 px-4 py-2">
+                    NPR {order.totalAmount}
+                  </td>
+                  <td className="border border-gray-300 px-4 py-2 flex gap-2">
+                    <Button
+                      buttonName={"View"}
+                      handleOnClick={() =>
+                        navigate(
+                          `/dashboard/order-details?purchase_order_id=${order.orderId}`
+                        )
+                      }
+                    />
+                    <select
+                      value={order.orderStatus}
+                      onChange={(e) =>
+                        updateOrder(order.orderId, e.target.value)
+                      }
+                      className="border px-2 py-1 rounded"
+                    >
+                      <option value="pending">Pending</option>
+                      <option value="shipped">Shipped</option>
+                      <option value="delivered">Delivered</option>
+                      <option value="cancelled">Cancelled</option>
+                    </select>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>

@@ -3,10 +3,10 @@ export default function AboutUsPage() {
     <div className="min-h-screen bg-background">
       <main className="container mx-auto py-8 px-4">
         <section className="mb-12">
-          <h1 className="text-4xl font-bold mb-4">About BarberSupply Co.</h1>
+          <h1 className="text-4xl font-bold mb-4">About Yanki</h1>
           <p className="text-xl mb-4">
-            Welcome to BarberSupply Co., your one-stop shop for premium
-            barbershop equipment and supplies.
+            Welcome to Yanki, your one-stop shop for premium barbershop
+            equipment and supplies.
           </p>
           <p className="mb-4">
             Founded in 2010, we've been passionate about providing barbers and
@@ -41,35 +41,6 @@ export default function AboutUsPage() {
               Support both professional barbers and home grooming enthusiasts
             </li>
           </ul>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="text-3xl font-bold mb-4">Our Products</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div className="bg-muted p-4 rounded-lg">
-              <h3 className="text-xl font-semibold mb-2">
-                Clippers & Trimmers
-              </h3>
-              <p>
-                Professional-grade clippers and trimmers for precise cuts and
-                clean lines.
-              </p>
-            </div>
-            <div className="bg-muted p-4 rounded-lg">
-              <h3 className="text-xl font-semibold mb-2">Scissors & Shears</h3>
-              <p>
-                High-quality scissors and shears for all your cutting and
-                texturizing needs.
-              </p>
-            </div>
-            <div className="bg-muted p-4 rounded-lg">
-              <h3 className="text-xl font-semibold mb-2">Grooming Products</h3>
-              <p>
-                A wide range of styling products, beard care essentials, and
-                more.
-              </p>
-            </div>
-          </div>
         </section>
 
         <section className="mb-12">
