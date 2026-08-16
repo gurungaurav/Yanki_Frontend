@@ -2,9 +2,94 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Yanki</title>
+    <meta name="theme-color" content="#08080a" />
+
+    <!-- Primary meta -->
+    <title>Yanki | Professional Barber Supplies, Clippers & Trimmers</title>
+    <meta
+      name="description"
+      content="Shop professional barber supplies at Yanki — precision clippers, trimmers, shavers, shears and grooming essentials trusted by working barbers. Fast shipping and easy returns."
+    />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta name="author" content="Yanki" />
+    <!--
+      No <link rel="canonical"> or <meta property="og:url"> here on purpose:
+      a static value would point every route at the homepage. Both are set
+      per page by <Seo> (src/components/seo.jsx).
+    -->
+
+    <!-- Icons -->
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="apple-touch-icon" href="/logo.png" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Yanki" />
+    <meta
+      property="og:title"
+      content="Yanki | Professional Barber Supplies, Clippers & Trimmers"
+    />
+    <meta
+      property="og:description"
+      content="Precision clippers, trimmers, shavers and shears built for professional barbers. Shop the Yanki range."
+    />
+    <meta property="og:image" content="https://yanki.com/og-image.png" />
+    <meta property="og:image:alt" content="Yanki professional barber supplies" />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      name="twitter:title"
+      content="Yanki | Professional Barber Supplies, Clippers & Trimmers"
+    />
+    <meta
+      name="twitter:description"
+      content="Precision clippers, trimmers, shavers and shears built for professional barbers."
+    />
+    <meta name="twitter:image" content="https://yanki.com/og-image.png" />
+
+    <!-- Fonts: preconnect + single non-blocking request -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&display=swap"
+    />
+
+    <!-- Structured data: brand + sitewide search -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://yanki.com/#organization",
+            "name": "Yanki",
+            "url": "https://yanki.com/",
+            "logo": "https://yanki.com/logo.png",
+            "description": "Professional barber supplies — clippers, trimmers, shavers, shears and grooming essentials.",
+            "sameAs": []
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://yanki.com/#website",
+            "url": "https://yanki.com/",
+            "name": "Yanki",
+            "publisher": { "@id": "https://yanki.com/#organization" },
+            "potentialAction": {
+              "@type": "SearchAction",
+              "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": "https://yanki.com/products?search={search_term_string}"
+              },
+              "query-input": "required name=search_term_string"
+            }
+          }
+        ]
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>

@@ -10,7 +10,8 @@ import useUserStore from "../../store/useUserStore";
 import * as Yup from "yup";
 
 export default function EditProfilePage() {
-  const { token } = useUserStore((state) => state.user);
+  const loggedUser = useUserStore((state) => state.user);
+  const token = loggedUser?.token;
   const [initialValues, setInitialValues] = useState({
     firstName: "",
     lastName: "",
@@ -101,41 +102,52 @@ export default function EditProfilePage() {
   }, [token]);
 
   return (
-    <div className="flex items-center justify-center pt-10 pb-10">
+    <div className="flex items-center justify-center  px-4 py-8 md:py-16">
       <form
         onSubmit={formik.handleSubmit}
         encType="multipart/form-data"
-        className="rounded-md px-10 py-6 flex flex-col gap-2 w-[50%] shadow-md border border-gray-200"
+        className="rounded-md px-4 sm:px-6 md:px-8 lg:px-10 py-6 md:py-8 flex flex-col gap-3 md:gap-4 w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-2xl shadow-md border border-gray-200 bg-white"
       >
-        <div className="flex justify-end">
+        <div className="flex justify-between items-center mb-4 md:mb-6">
+          <h2 className="text-lg sm:text-xl md:text-2xl font-semibold text-gray-800">
+            Edit Profile
+          </h2>
           <Link
             to={`/profile`}
-            className="rounded-full p-2 hover:bg-neutral-100 text-2xl duration-300"
+            className="rounded-full p-2 hover:bg-neutral-100 text-lg sm:text-xl md:text-2xl duration-300"
           >
             <RxCross1 />
           </Link>
         </div>
-        <div className="flex gap-4">
-          <TextInput
-            label="First Name"
-            type="text"
-            name="firstName"
-            formik={formik}
-          />
-          <TextInput
-            label="Last Name"
-            type="text"
-            name="lastName"
-            formik={formik}
-          />
+
+        <div className="flex flex-col sm:flex-row gap-3 md:gap-4">
+          <div className="flex-1">
+            <TextInput
+              label="First Name"
+              type="text"
+              name="firstName"
+              formik={formik}
+            />
+          </div>
+          <div className="flex-1">
+            <TextInput
+              label="Last Name"
+              type="text"
+              name="lastName"
+              formik={formik}
+            />
+          </div>
         </div>
+
         <TextInput
           label="Username"
           type="text"
           name="username"
           formik={formik}
         />
+
         <TextInput label="Address" type="text" name="address" formik={formik} />
+
         <TextInput
           label="Phone Number"
           type="number"
@@ -143,8 +155,18 @@ export default function EditProfilePage() {
           formik={formik}
         />
 
-        <div className="flex justify-end text-sm font-semibold gap-4 mt-8">
-          <Button type="submit" buttonName={"Update"} />
+        <div className="flex flex-col sm:flex-row justify-end text-sm font-semibold gap-3 md:gap-4 mt-6 md:mt-8">
+          <Button
+            type="button"
+            buttonName="Cancel"
+            className="w-full sm:w-auto bg-gray-500 hover:bg-gray-600"
+            handleOnClick={() => navigate("/profile")}
+          />
+          <Button
+            type="submit"
+            buttonName="Update"
+            className="w-full sm:w-auto"
+          />
         </div>
       </form>
     </div>

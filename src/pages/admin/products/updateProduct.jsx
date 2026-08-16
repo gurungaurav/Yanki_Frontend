@@ -7,15 +7,16 @@ import TextInput from "../../../components/textInput";
 import { updateProduct, getSpecificProduct } from "../../../api/product.api";
 import { toast } from "react-toastify";
 import { useNavigate, useParams } from "react-router-dom";
+import { MdClose, MdCloudUpload } from "react-icons/md";
 
 const UpdateProductPage = () => {
   const [availableCategories, setAvailableCategories] = useState([]);
   const { productId } = useParams();
-  const [product, setProduct] = useState({});
   const [removedImageIds, setRemovedImageIds] = useState([]);
-  const [newImages, setNewImages] = useState([]); // For newly uploaded images
-  const [imagePreviews, setImagePreviews] = useState([]); // To store image previews
+  const [newImages, setNewImages] = useState([]);
+  const [imagePreviews, setImagePreviews] = useState([]);
   const [initialValues, setInitialValues] = useState({});
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   const formik = useFormik({
@@ -34,7 +35,7 @@ const UpdateProductPage = () => {
       description: Yup.string().required("Description is required"),
       stockQuantity: Yup.number().min(1).required("Quantity is required"),
       categoryId: Yup.string().required("Category is required"),
-      images: Yup.array().min(4, "At least two image is required"),
+      images: Yup.array().min(1, "At least one image is required"),
     }),
     onSubmit: async (values) => {
       handleSubmit(values);
@@ -52,7 +53,7 @@ const UpdateProductPage = () => {
   const fetchProduct = async () => {
     try {
       const response = await getSpecificProduct(productId);
-      setProduct(response.data);
+
       const initialFormValues = {
         name: response.data.name,
         price: response.data.price,
@@ -69,8 +70,11 @@ const UpdateProductPage = () => {
           _id: image._id,
         }))
       );
+      setLoading(false);
     } catch (error) {
       console.error("Failed to fetch product:", error);
+      toast.error("Failed to fetch product details");
+      setLoading(false);
     }
   };
 
@@ -80,6 +84,7 @@ const UpdateProductPage = () => {
       setAvailableCategories(data.data);
     } catch (error) {
       console.error("Failed to fetch categories:", error);
+      toast.error("Failed to fetch categories");
     }
   };
 
@@ -91,10 +96,11 @@ const UpdateProductPage = () => {
         ...formik.values.images,
         ...uploadedFiles,
       ]);
-      // Generate previews for each uploaded file
+
       const previews = uploadedFiles.map((file) => ({
         imageUrl: URL.createObjectURL(file),
-        _id: null, // New images do not have an ID yet
+        _id: null,
+        isNew: true,
       }));
       setImagePreviews((prevPreviews) => [...prevPreviews, ...previews]);
     }
@@ -105,16 +111,17 @@ const UpdateProductPage = () => {
     const removedImage = updatedPreviews.splice(index, 1)[0];
     setImagePreviews(updatedPreviews);
 
-    if (removedImage._id) {
-      // The image is from the existing product (product.images), so we need to mark it for deletion
+    if (removedImage._id && !removedImage.isNew) {
       setRemovedImageIds((prevIds) => [...prevIds, removedImage._id]);
     } else {
-      // The image is a newly uploaded image (newImages), so we just remove it from newImages
-      const newIndex = index - product.images.length;
-      setNewImages((prevImages) => prevImages.filter((_, i) => i !== newIndex));
+      const newImageIndex = imagePreviews
+        .slice(0, index)
+        .filter((img) => img.isNew).length;
+      setNewImages((prevImages) =>
+        prevImages.filter((_, i) => i !== newImageIndex)
+      );
     }
 
-    // Update Formik's images field by removing the image at the index
     formik.setFieldValue(
       "images",
       formik.values.images.filter((_, i) => i !== index)
@@ -151,123 +158,227 @@ const UpdateProductPage = () => {
     }
   };
 
-  return (
-    <div className="p-6 mx-auto mt-10 max-w-2xl container shadow-md border border-gray-200 rounded-md">
-      <h2 className="text-xl font-bold mb-4">Update Product</h2>
-      <form onSubmit={formik.handleSubmit} className="flex flex-col gap-6">
-        <div className="flex gap-6 w-full">
-          <TextInput
-            name="name"
-            label={"Product Name"}
-            placeholder="Enter the product name"
-            type="text"
-            formik={formik}
-          />
-          <TextInput
-            label={"Price"}
-            name="price"
-            placeholder="Enter the price"
-            type="number"
-            formik={formik}
-          />
+  if (loading) {
+    return (
+      <div className="">
+        <div className="flex justify-center items-center h-64 md:h-96">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <h1 className="text-lg md:text-xl font-semibold text-gray-600">
+              Loading product...
+            </h1>
+          </div>
         </div>
-        <div className="flex gap-6 w-full">
-          <div className="flex h-[4rem] flex-col gap-1 w-full">
-            <label
-              htmlFor="categoryId"
-              className="text-sm text-gray-600 font-semibold"
-            >
-              Category
-            </label>
-            <select
-              value={formik.values.categoryId}
-              onChange={formik.handleChange}
-              name="categoryId"
-              className="border p-2 rounded w-full"
-            >
-              {availableCategories.map((option) => (
-                <option key={option._id} value={option._id}>
-                  {option.name}
-                </option>
-              ))}
-            </select>
+      </div>
+    );
+  }
+
+  return (
+    <div className="">
+      <div className="bg-white shadow-md border border-gray-200 rounded-lg p-4 sm:p-6 md:p-8">
+        {/* Header */}
+        <div className="mb-6 md:mb-8">
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold mb-2">
+            Update Product
+          </h2>
+          <p className="text-sm md:text-base text-gray-600">
+            Modify the product details below
+          </p>
+        </div>
+
+        <form onSubmit={formik.handleSubmit} className="space-y-6">
+          {/* Product Name and Price */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+            <div>
+              <TextInput
+                name="name"
+                label="Product Name"
+                placeholder="Enter the product name"
+                type="text"
+                formik={formik}
+              />
+            </div>
+            <div>
+              <TextInput
+                label="Price (NPR)"
+                name="price"
+                placeholder="Enter the price"
+                type="number"
+                formik={formik}
+              />
+            </div>
           </div>
 
-          <TextInput
-            name="stockQuantity"
-            label={"Quantity"}
-            placeholder="Enter the quantity"
-            type="number"
-            formik={formik}
-          />
-        </div>
-
-        <div className="flex flex-col gap-1 w-full">
-          <label
-            htmlFor="description"
-            className="text-sm text-gray-600 font-semibold"
-          >
-            Description
-          </label>
-          <textarea
-            className={`rounded-md border p-2 focus:outline-black ${
-              formik.errors.description && formik.touched.description
-                ? "border-red-500"
-                : ""
-            }`}
-            name="description"
-            id="description"
-            placeholder="Enter the description"
-            value={formik.values.description}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-          />
-          {formik.touched.description && formik.errors.description && (
-            <div className="text-xs text-red-500">
-              {String(formik.errors.description)}
-            </div>
-          )}
-        </div>
-
-        <div className="flex flex-col gap-1 w-full mb-4">
-          <label
-            htmlFor="images"
-            className="text-sm text-gray-600 font-semibold"
-          >
-            Images
-          </label>
-          <input
-            type="file"
-            accept="image/*"
-            name="images"
-            id="images"
-            multiple
-            onChange={handleImageUpload}
-            className="w-full p-2 border rounded-lg"
-          />
-          {/* Display images */}
-          {imagePreviews.map((image, index) => (
-            <div key={index} className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <img
-                  src={image.imageUrl}
-                  alt={`Preview ${index}`}
-                  className="w-12 h-12 object-cover rounded"
-                />
-                <span className="text-sm">Image {index + 1}</span>
-              </div>
-              <button
-                type="button"
-                onClick={() => handleRemoveImage(index)}
-                className="text-red-500 hover:underline text-sm"
+          {/* Category and Quantity */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+            <div className="flex flex-col gap-1 w-full">
+              <label
+                htmlFor="categoryId"
+                className="text-sm md:text-base text-gray-700 font-semibold"
               >
-                Remove
-              </button>
+                Category
+              </label>
+              <select
+                value={formik.values.categoryId}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                name="categoryId"
+                className={`border border-gray-300 p-2 md:p-3 rounded-lg text-sm md:text-base focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full ${
+                  formik.errors.categoryId && formik.touched.categoryId
+                    ? "border-red-500"
+                    : ""
+                }`}
+              >
+                <option value="">Select a category</option>
+                {availableCategories.map((option) => (
+                  <option key={option._id} value={option._id}>
+                    {option.name}
+                  </option>
+                ))}
+              </select>
+              {formik.touched.categoryId && formik.errors.categoryId && (
+                <div className="text-xs md:text-sm text-red-500 mt-1">
+                  {formik.errors.categoryId}
+                </div>
+              )}
             </div>
-          ))}
-        </div>
-        <Button buttonName={"Update Product"} type={"submit"} />
-      </form>
+
+            <div>
+              <TextInput
+                name="stockQuantity"
+                label="Stock Quantity"
+                placeholder="Enter the quantity"
+                type="number"
+                formik={formik}
+              />
+            </div>
+          </div>
+
+          {/* Description */}
+          <div className="flex flex-col gap-1 w-full">
+            <label
+              htmlFor="description"
+              className="text-sm md:text-base text-gray-700 font-semibold"
+            >
+              Description
+            </label>
+            <textarea
+              className={`rounded-lg border border-gray-300 p-2 md:p-3 text-sm md:text-base focus:ring-2 focus:ring-blue-500 focus:border-blue-500 min-h-[100px] md:min-h-[120px] resize-vertical ${
+                formik.errors.description && formik.touched.description
+                  ? "border-red-500"
+                  : ""
+              }`}
+              name="description"
+              id="description"
+              placeholder="Enter a detailed description of the product"
+              value={formik.values.description}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              rows={4}
+            />
+            {formik.touched.description && formik.errors.description && (
+              <div className="text-xs md:text-sm text-red-500 mt-1">
+                {formik.errors.description}
+              </div>
+            )}
+          </div>
+
+          {/* Images Management */}
+          <div className="flex flex-col gap-2 w-full">
+            <label
+              htmlFor="images"
+              className="text-sm md:text-base text-gray-700 font-semibold"
+            >
+              Product Images
+            </label>
+
+            {/* Current Images */}
+
+            {/* Upload New Images */}
+            <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 md:p-6 text-center hover:border-blue-400 transition-colors">
+              <input
+                type="file"
+                accept="image/*"
+                name="images"
+                id="images"
+                multiple
+                onChange={handleImageUpload}
+                onBlur={() => formik.setFieldTouched("images", true)}
+                className="hidden"
+              />
+              <label
+                htmlFor="images"
+                className="cursor-pointer flex flex-col items-center gap-2"
+              >
+                <MdCloudUpload className="h-8 w-8 md:h-12 md:w-12 text-gray-400" />
+                <div className="text-sm md:text-base text-gray-600">
+                  <span className="font-medium text-blue-600">
+                    Click to upload
+                  </span>{" "}
+                  or drag and drop
+                </div>
+                <p className="text-xs md:text-sm text-gray-500">
+                  PNG, JPG, GIF up to 10MB
+                </p>
+              </label>
+            </div>
+            {imagePreviews.length > 0 && (
+              <div className="mb-4">
+                <h4 className="text-sm md:text-base font-medium text-gray-700 mb-3">
+                  Current Images ({imagePreviews.length})
+                </h4>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+                  {imagePreviews.map((image, index) => (
+                    <div key={index} className="relative group">
+                      <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden border border-gray-200">
+                        <img
+                          src={image.imageUrl}
+                          alt={`Preview ${index + 1}`}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveImage(index)}
+                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors "
+                      >
+                        <MdClose className="h-6 w-6" />
+                      </button>
+                      <div className="mt-1">
+                        <p className="text-xs text-gray-600">
+                          {image.isNew ? "New" : "Existing"}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {formik.touched.images && formik.errors.images && (
+              <div className="text-xs md:text-sm text-red-500 mt-1">
+                {formik.errors.images}
+              </div>
+            )}
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex flex-col sm:flex-row gap-3 md:gap-4 pt-4 md:pt-6">
+            <Button
+              type="button"
+              buttonName="Cancel"
+              handleOnClick={() => navigate("/dashboard/products")}
+              className="w-full sm:w-auto bg-gray-500 hover:bg-gray-600"
+            />
+            <Button
+              buttonName="Update Product"
+              type="submit"
+              className="w-full sm:w-auto"
+              disabled={formik.isSubmitting}
+            />
+          </div>
+        </form>
+      </div>
     </div>
   );
 };

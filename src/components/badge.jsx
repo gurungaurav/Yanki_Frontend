@@ -20,7 +20,7 @@ export const Badge = ({ status }) => {
 
   return (
     <span
-      className={`inline-block px-3 py-1 text-xs font-bold rounded-xl ${colorClass}`}
+      className={`inline-block w-fit px-3 py-1 text-xs font-bold rounded-xl ${colorClass}`}
     >
       {status}
     </span>
