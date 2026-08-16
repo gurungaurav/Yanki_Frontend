@@ -1,17 +1,20 @@
+import { useState } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { RegisterUser } from "../../api/auth.api";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
+import { Eye, EyeOff } from "lucide-react";
+import { RegisterUser } from "../../api/auth.api";
 import TextInput from "../../components/textInput";
-import Button from "../../components/button";
-import { useState } from "react";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
+import Seo from "../../components/seo";
 
 export default function RegistrationPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const redirectTo = location.state?.from ?? "/";
 
   const formik = useFormik({
     initialValues: {
@@ -40,137 +43,165 @@ export default function RegistrationPage() {
         .oneOf([Yup.ref("password"), null], "Passwords must match")
         .required("Confirm password is required"),
       phoneNumber: Yup.string()
-        .length(10, "Phone number must be exactly 10 digits")
+        .matches(/^\d{10}$/, "Phone number must be exactly 10 digits")
         .required("Phone number is required"),
       address: Yup.string().required("Address is required"),
     }),
-    onSubmit: (values) => {
-      handleSubmit(values);
+    onSubmit: async (values) => {
+      try {
+        const data = await RegisterUser(values);
+        toast.success(data.message);
+        formik.resetForm();
+        // Keep the original destination so checkout can resume after login.
+        navigate("/login", { state: { from: redirectTo } });
+      } catch (error) {
+        toast.error(
+          error.response?.data?.message ?? "Could not create your account"
+        );
+      }
     },
   });
 
-  const handleSubmit = async (values) => {
-    try {
-      const data = await RegisterUser(values);
-      toast.success(data.message);
-      formik.setSubmitting(false);
-      formik.resetForm();
-      navigate("/login");
-      console.log("Form submitted");
-    } catch (error) {
-      console.log(error);
-      formik.setSubmitting(false);
-      toast.error(error.response.data.message);
-    }
-  };
-
   return (
-    <div className="flex my-20 items-center justify-center  p-4">
-      <form
-        onSubmit={formik.handleSubmit}
-        className="w-full max-w-2xl rounded-md bg-white p-8 shadow-md border border-gray-200 "
-      >
-        <h1 className="mb-8 text-center text-3xl font-bold text-gray-800">
-          Create an Account
-        </h1>
-        <div className="flex flex-col gap-4">
-          <div className="flex gap-4">
+    <div className="flex min-h-[70vh] items-center justify-center bg-gray-50 px-4 py-16">
+      <Seo title="Create an account" path="/register" noIndex />
+
+      <div className="w-full max-w-2xl">
+        <div className="text-center">
+          <h1 className="font-display text-4xl tracking-wide text-ink-950">
+            Create an account
+          </h1>
+          <p className="mt-2 text-gray-600">
+            Save your details and check out faster next time.
+          </p>
+        </div>
+
+        <form
+          onSubmit={formik.handleSubmit}
+          className="mt-8 rounded-2xl border border-gray-200 bg-white p-6 sm:p-8"
+          noValidate
+        >
+          <div className="grid gap-4 sm:grid-cols-2">
             <TextInput
-              label="First Name"
+              label="First name"
               type="text"
               name="firstName"
-              placeholder={"Enter your first name"}
+              placeholder="Enter your first name"
               formik={formik}
             />
             <TextInput
-              label="Last Name"
+              label="Last name"
               type="text"
               name="lastName"
-              placeholder={"Enter your last name"}
+              placeholder="Enter your last name"
               formik={formik}
             />
           </div>
 
-          {/* Email */}
-          <TextInput label="Email" type="email" name="email" formik={formik} />
-
-          <TextInput
-            label="Username"
-            type="text"
-            name="username"
-            placeholder={"Enter your username"}
-            formik={formik}
-          />
-
-          <div className="flex gap-4">
+          <div className="mt-4 grid gap-4 sm:grid-cols-2">
             <TextInput
-              label="Phone Number"
+              label="Email"
+              type="email"
+              name="email"
+              placeholder="you@example.com"
+              formik={formik}
+            />
+            <TextInput
+              label="Username"
               type="text"
+              name="username"
+              placeholder="Choose a username"
+              formik={formik}
+            />
+          </div>
+
+          <div className="mt-4 grid gap-4 sm:grid-cols-2">
+            <TextInput
+              label="Phone number"
+              type="tel"
               name="phoneNumber"
-              placeholder={"Enter your phone number"}
+              placeholder="98XXXXXXXX"
               formik={formik}
             />
             <TextInput
               label="Address"
               type="text"
               name="address"
-              placeholder={"Enter your address"}
+              placeholder="Street, area, city"
               formik={formik}
             />
           </div>
 
-          <div className="relative">
-            <TextInput
-              label="Password"
-              type={showPassword ? "text" : "password"}
-              name="password"
-              placeholder={"Enter your password"}
-              formik={formik}
-            />
-            <div
-              className="absolute inset-y-0 right-0 pr-3 mt-9 flex items-center cursor-pointer  h-fit w-fit"
-              onClick={() => setShowPassword(!showPassword)}
-            >
-              {showPassword ? <FaEyeSlash /> : <FaEye />}
+          <div className="mt-4 grid gap-4 sm:grid-cols-2">
+            <div className="relative">
+              <TextInput
+                label="Password"
+                type={showPassword ? "text" : "password"}
+                name="password"
+                placeholder="At least 6 characters"
+                formik={formik}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((v) => !v)}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+                className="absolute right-3 top-9 text-gray-500 transition-colors hover:text-ink-950"
+              >
+                {showPassword ? (
+                  <EyeOff className="h-4 w-4" aria-hidden="true" />
+                ) : (
+                  <Eye className="h-4 w-4" aria-hidden="true" />
+                )}
+              </button>
+            </div>
+
+            <div className="relative">
+              <TextInput
+                label="Confirm password"
+                type={showConfirmPassword ? "text" : "password"}
+                name="confirmPassword"
+                placeholder="Re-enter your password"
+                formik={formik}
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword((v) => !v)}
+                aria-label={
+                  showConfirmPassword ? "Hide password" : "Show password"
+                }
+                className="absolute right-3 top-9 text-gray-500 transition-colors hover:text-ink-950"
+              >
+                {showConfirmPassword ? (
+                  <EyeOff className="h-4 w-4" aria-hidden="true" />
+                ) : (
+                  <Eye className="h-4 w-4" aria-hidden="true" />
+                )}
+              </button>
             </div>
           </div>
 
-          <div className="relative">
-            <TextInput
-              label="Confirm Password"
-              type={showConfirmPassword ? "text" : "password"}
-              name="confirmPassword"
-              placeholder={"Confirm your password"}
-              formik={formik}
-            />
-            <div
-              className="absolute inset-y-0 right-0 pr-3 mt-9 flex items-center cursor-pointer  h-fit w-fit"
-              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-            >
-              {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
-            </div>
-          </div>
-        </div>
+          {/* The button had no disabled state, so it could be submitted
+              repeatedly while the first request was still in flight. */}
+          <button
+            type="submit"
+            disabled={formik.isSubmitting}
+            className="mt-6 w-full rounded-lg bg-brand-500 px-6 py-3.5 text-sm font-bold uppercase tracking-wide text-ink-950 transition-colors hover:bg-brand-400 disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-500"
+          >
+            {formik.isSubmitting ? "Creating account…" : "Create account"}
+          </button>
 
-        <Button
-          type={"submit"}
-          className={"mt-6 w-full"}
-          buttonName={"Register"}
-        />
-
-        {/* Additional Links */}
-        <div className="mt-6 text-center">
-          <p className="text-sm text-gray-600">
-            Already have an account?
-            <button
-              onClick={() => navigate("/login")}
-              className="font-medium text-blue-500 hover:underline cursor-pointer "
+          <p className="mt-6 text-center text-sm text-gray-600">
+            Already have an account?{" "}
+            <Link
+              to="/login"
+              state={{ from: redirectTo }}
+              className="font-semibold text-ink-950 underline-offset-4 hover:underline"
             >
-              Login
-            </button>
+              Log in
+            </Link>
           </p>
-        </div>
-      </form>
+        </form>
+      </div>
     </div>
   );
 }

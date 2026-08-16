@@ -3,10 +3,10 @@ import Router from "./routes/index.routes";
 
 function App() {
   return (
-    <>
+    <div className="font-sans">
       <Router />
       <ToastContainer />
-    </>
+    </div>
   );
 }
 

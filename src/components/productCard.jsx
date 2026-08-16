@@ -1,25 +1,24 @@
-import { ShoppingCart } from "lucide-react";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import useCartStore from "../store/useCartStore";
+import { Link } from "react-router-dom";
+import { ShoppingBag } from "lucide-react";
 import { toast } from "react-toastify";
+import useCartStore from "../store/useCartStore";
 
 export default function ProductCard({
   _id,
   name,
   categoryId,
-  description,
   price,
   image,
   hoverImage,
   stockQuantity,
 }) {
   const [isImageHovered, setIsImageHovered] = useState(false);
-  const navigate = useNavigate();
   const addItems = useCartStore((state) => state.addToCart);
 
-  const addToCart = (e) => {
-    e.stopPropagation(); // Stop event propagation
+  const outOfStock = stockQuantity === 0;
+
+  const addToCart = () => {
     addItems({
       id: _id,
       name,
@@ -28,55 +27,82 @@ export default function ProductCard({
       imageUrl: image,
       quantity: 1,
     });
-    toast.success("Product added to cart");
+    toast.success("Added to cart!");
   };
 
   return (
-    <div
-      onClick={() => navigate(`/product/${_id}`)}
-      // to={`/product/${_id}`}
-      className="bg-white rounded-md cursor-pointer shadow border border-gray-100 overflow-hidden transition-all duration-300 hover:shadow-md"
-    >
+    <div className="group relative bg-white">
       <div
-        className="relative h-64 w-full cursor-pointer overflow-hidden"
+        className="relative h-72 w-full overflow-hidden bg-gray-100 sm:h-80"
         onMouseEnter={() => setIsImageHovered(true)}
         onMouseLeave={() => setIsImageHovered(false)}
       >
-        {/* Main Image */}
         <img
           src={image || "/placeholder.svg"}
           alt={name}
-          className={`absolute inset-0 object-cover w-full h-full transition-all duration-500 transform ${
-            isImageHovered ? "opacity-0 " : "opacity-100 "
+          loading="lazy"
+          decoding="async"
+          className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ${
+            isImageHovered && hoverImage ? "opacity-0" : "opacity-100"
           }`}
         />
-        {/* Hover Image */}
-        <img
-          src={hoverImage || "/placeholder.svg"}
-          alt={`${name} - alternate view`}
-          className={`absolute inset-0 object-cover w-full h-full transition-all duration-500 transform ${
-            isImageHovered ? "opacity-100 " : "opacity-0 "
-          }`}
-        />
-      </div>
-      <div className="p-6">
-        <div className="flex justify-between items-start mb-2">
-          <div>
-            <h3 className="text-lg font-semibold mb-1">{name}</h3>
-            <p className="text-sm text-gray-600">{categoryId?.name}</p>
+
+        {hoverImage && (
+          <img
+            src={hoverImage}
+            alt=""
+            aria-hidden="true"
+            loading="lazy"
+            decoding="async"
+            className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ${
+              isImageHovered ? "opacity-100" : "opacity-0"
+            }`}
+          />
+        )}
+
+        {outOfStock ? (
+          <div className="absolute inset-0 flex items-center justify-center bg-ink-950/50">
+            <span className="rounded bg-white/95 px-3 py-1.5 text-sm font-semibold text-ink-950">
+              Out of stock
+            </span>
           </div>
-          <span className="text-base font-semibold text-gray-900">
-            NPR {price}
-          </span>
-        </div>
-        <p className="text-gray-700 mb-4 h-12 line-clamp-2">{description}</p>
-        <button
-          onClick={addToCart}
-          className="w-full bg-gray-900 hover:opacity-90 text-white font-semibold py-3 px-4 rounded-lg flex items-center justify-center transition duration-300 transform  cursor-pointer"
-        >
-          <ShoppingCart size={20} className="mr-2" />
-          Add to Cart
-        </button>
+        ) : (
+          /*
+           * Sits above the stretched card link so it stays clickable, and
+           * reveals on keyboard focus as well as hover.
+           */
+          <button
+            type="button"
+            onClick={addToCart}
+            className="absolute inset-x-4 bottom-4 z-20 flex items-center justify-center gap-2 rounded-lg bg-ink-950 py-3 text-sm font-semibold text-white opacity-0 transition-all duration-300 hover:bg-ink-800 focus-visible:translate-y-0 focus-visible:opacity-100 group-hover:translate-y-0 group-hover:opacity-100 md:translate-y-2"
+          >
+            <ShoppingBag className="h-4 w-4" aria-hidden="true" />
+            Add to cart
+          </button>
+        )}
+      </div>
+
+      <div className="px-1 py-4">
+        {categoryId?.name && (
+          <p className="mb-2 text-xs font-medium uppercase tracking-wider text-gray-400">
+            {categoryId.name}
+          </p>
+        )}
+
+        <h3 className="mb-2 line-clamp-2 text-sm font-medium text-gray-900 sm:text-base">
+          {/* Stretched link: the whole card is clickable, but only one anchor
+              exists in the markup. */}
+          <Link
+            to={`/product/${_id}`}
+            className="transition-colors after:absolute after:inset-0 after:z-10 hover:text-gray-600"
+          >
+            {name}
+          </Link>
+        </h3>
+
+        <p className="text-lg font-bold text-ink-950">
+          NPR {price?.toLocaleString()}
+        </p>
       </div>
     </div>
   );

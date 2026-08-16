@@ -3,6 +3,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { allRoutes } from "./all.routes";
 import DashboardLayout from "../layout/adminDashboardLayout";
 import HomeLayout from "../layout/homeLayout";
+import Spinner from "../components/spinner";
+import ScrollToTop from "../components/scrollTop";
 
 function MainWrapper({ route, children }) {
   const HomeLayoutWrapper = route?.hasHomeLayout ? HomeLayout : Fragment;
@@ -18,7 +20,8 @@ function MainWrapper({ route, children }) {
 export default function Router() {
   return (
     <BrowserRouter>
-      <Suspense fallback={<div>...Loaading</div>}>
+      <Suspense fallback={<Spinner />}>
+        <ScrollToTop />
         <Routes>
           {allRoutes.map((route) => {
             return (
